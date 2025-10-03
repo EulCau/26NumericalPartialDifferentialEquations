@@ -4,11 +4,11 @@ v_0 = @(x) sin(2*pi*x);
 Tend = 0.3;
 v_exact = @(x) sin(2*pi*(x+Tend));
 
-N = 30; J = 100;
+N = 30; J = 50;
 v_num = solve_pde(N, J, Tend, v_0);
 shou_result(v_num, v_exact, Tend / N)
 
-N = 10; J = 100;
+N = 10; J = 50;
 v_num = solve_pde(N, J, Tend, v_0);
 shou_result(v_num, v_exact, Tend / N)
 
