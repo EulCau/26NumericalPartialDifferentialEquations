@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage{ctex}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\geometry{a4paper,margin=1in}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+\begin{document}
+    \section*{HW02}
+        \setcounter{section}{2}
+        \setcounter{subsection}{1}
+
+        \subsubsection{}
+            图 2.1.4 和 2.1.5 中收敛缓慢的原因在于初始数据 $f(x)$ 是分段线性函数 (在 $0 \leq x \leq \pi$ 和 $\pi \leq x \leq 2\pi$ 上线性), 在 $x = \pi$ 处存在角点. 这种不光滑性导致初始数据的傅里叶级数包含高频分量, 且高频系数的衰减速率较慢(如 $1/\omega^2$ ). 在定理2.1.1的证明中, 误差被分解为三项: 
+            \begin{enumerate}[label=(\Roman*)]
+                \item 低频误差($\omega \leq M$),
+                \item 高频初始数据的能量($\omega > M$),
+                \item 高频放大误差($\omega > M$).
+            \end{enumerate}
+
+            由于初始数据的不光滑性, 项 (II)(即 $\sum_{\omega > M} \hat{f}(\omega)^2$ )较大, 因为高频分量的贡献显著. 即使增加网格点数 $N$, 项 (II) 的衰减也较慢, 从而主导了整体误差, 导致收敛缓慢. 项 (I) 和 (III) 在 $M$ 较大时可能较小, 但对于固定网格, 项 (II) 是主要误差源.
+
+        \subsubsection{}
+            原格式(2.1.11)用于近似 $u_t = u_x$:
+            \begin{equation*}
+                v_j^{n+1} = (I + kD_0)v_j^n + \sigma kh D_+ D_- v_j^n.
+            \end{equation*}
+            要近似 $u_t = -u_x$, 需修改空间导数的符号, 得到:
+            \begin{equation*}
+                v_j^{n+1} = (I - kD_0)v_j^n + \sigma kh D_+ D_- v_j^n.
+            \end{equation*}
+            进行傅里叶稳定性分析, 令 $\lambda = k/h$, 符号为:
+            \begin{equation*}
+                \hat{Q} = 1 - i\lambda \sin \xi - 4\sigma\lambda \sin^2(\xi/2).
+            \end{equation*}
+            放大因子为:
+            \begin{equation*}
+                |\hat{Q}|^2 = \left(1 - 4\sigma\lambda \sin^2(\xi/2)\right)^2 + \lambda^2 \sin^2 \xi.
+            \end{equation*}
+            这与原格式的符号相同(因为 $\sin^2 \xi$ 是偶函数), 因此稳定性条件不变:
+            \begin{itemize}
+                \item 如果 $2\sigma \leq 1$, 则需 $0 < \lambda \leq 2\sigma \leq 1$ (条件2.1.14).
+                \item 如果 $1 \leq 2\sigma$, 则需 $2\sigma\lambda \leq 1$ (条件2.1.15).
+            \end{itemize}
+            这些条件对于稳定性是必要的, 可通过令 $\xi \to 0$ 或 $\xi \to \pi$ 验证.
+
+        \subsubsection{}
+            方程(2.1.11)为:
+            \begin{equation*}
+                v_j^{n+1} = v_j^n + kD_0v_j^n + \sigma kh D_+ D_- v_j^n.
+            \end{equation*}
+            展开差分算子:
+            \begin{equation*}
+                v_j^{n+1} = v_j^n + \frac{\lambda}{2}(v_{j+1}^n - v_{j-1}^n) + \sigma\lambda (v_{j+1}^n - 2v_j^n + v_{j-1}^n),
+            \end{equation*}
+            其中 $\lambda = k/h$. 整理系数:
+            \begin{equation*}
+                v_j^{n+1} = (1 - 2\sigma\lambda) v_j^n + \left( \frac{\lambda}{2} + \sigma\lambda \right) v_{j+1}^n + \left( -\frac{\lambda}{2} + \sigma\lambda \right) v_{j-1}^n.
+            \end{equation*}
+            要使格式仅使用两个网格点, 需消除一个邻居点. 对于 $u_t = u_x$, 正确的迎风格式使用 $v_j^n$ 和 $v_{j+1}^n$, 因此令 $v_{j-1}^n$ 的系数为零:
+            \begin{equation*}
+                -\frac{\lambda}{2} + \sigma\lambda = 0 \implies \sigma = \frac{1}{2}.
+            \end{equation*}
+            代入得:
+            \begin{equation*}
+                v_j^{n+1} = (1 - \lambda) v_j^n + \lambda v_{j+1}^n,
+            \end{equation*}
+            这确实是迎风格式, 仅使用两个点. 稳定性条件为 $0 < \lambda \leq 1$. 如果选择 $\sigma = -\frac{1}{2}$, 会得到使用 $v_j^n$ 和 $v_{j-1}^n$ 的格式, 但对于 $u_t = u_x$ 不稳定.
+
+\end{document}
