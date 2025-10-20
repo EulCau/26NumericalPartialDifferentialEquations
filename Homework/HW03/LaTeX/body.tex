@@ -1,0 +1,94 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amssymb,geometry}
+\geometry{margin=2.5cm}
+\setlength{\parindent}{2em}
+
+\begin{document}
+
+\noindent \textbf{HW03}
+
+\vspace{1em}
+
+\noindent \textbf{2.2.1} \quad 
+Prove that the solution of the leap-frog scheme converges to the solution of the differential equation, if $\lambda \le 1-\delta$, $\delta > 0$.
+
+\medskip
+
+Consider the linear advection equation
+\[
+u_t + a u_x = 0,
+\]
+discretized by the leap-frog scheme:
+\[
+\frac{u_j^{n+1} - u_j^{n-1}}{2\Delta t} 
++ a\,\frac{u_{j+1}^n - u_{j-1}^n}{2\Delta x} = 0.
+\]
+Let $\lambda = a\Delta t / \Delta x$. The update formula is
+\[
+u_j^{n+1} = u_j^{n-1} - \lambda (u_{j+1}^n - u_{j-1}^n).
+\]
+
+\textbf{(1) Consistency.}
+By Taylor expansion,
+\[
+\frac{u(t+\Delta t)-u(t-\Delta t)}{2\Delta t}
+= u_t + \tfrac{1}{6}u_{ttt}\Delta t^2 + O(\Delta t^4),
+\]
+and similarly for the space derivative. Hence the local truncation error is
+\[
+\tau = O(\Delta t^2 + \Delta x^2),
+\]
+which tends to zero as $\Delta t, \Delta x \to 0$. Thus, the scheme is second-order accurate and consistent with the PDE.
+
+\textbf{(2) Stability.}
+Let $u_j^n = \rho^n e^{i k x_j}$, where $\theta = k \Delta x$.  
+Substitute into the scheme to obtain
+\[
+\rho^2 + 2i\lambda \sin\theta \,\rho - 1 = 0.
+\]
+Solving for $\rho$ gives
+\[
+\rho = -i\lambda \sin\theta \pm \sqrt{1 - \lambda^2 \sin^2\theta}.
+\]
+If $|\lambda \sin\theta| \le 1$, then
+\[
+|\rho|^2 = (\lambda \sin\theta)^2 + (1 - \lambda^2 \sin^2\theta) = 1,
+\]
+so each Fourier mode is neutrally stable.  
+If $\lambda > 1$, some modes satisfy $|\lambda \sin\theta| > 1$, leading to exponential growth.
+
+Therefore, for $\lambda \le 1-\delta$ with $\delta>0$, all modes remain bounded uniformly in time.  
+By the Lax equivalence theorem, since the scheme is consistent and stable, it converges to the true solution of the differential equation.
+
+\bigskip
+\noindent \textbf{2.2.2} \quad 
+Derive the explicit form of the leap-frog approximation for $\lambda=1$. Is the scheme suitable for computation?
+
+\medskip
+
+When $\lambda=1$, the amplification equation becomes
+\[
+\rho^2 + 2i\sin\theta\,\rho - 1 = 0,
+\]
+giving
+\[
+\rho = -i\sin\theta \pm \sqrt{1 - \sin^2\theta}
+      = -i\sin\theta \pm |\cos\theta|.
+\]
+Equivalently, the two roots can be expressed as
+\[
+\rho_1 = e^{-i\theta}, \qquad 
+\rho_2 = -e^{i\theta}.
+\]
+Hence the general Fourier solution is
+\[
+\rho^n = A e^{-in\theta} + B(-1)^n e^{in\theta}.
+\]
+The first term corresponds to the physical mode propagating correctly,  
+while the second term $(-1)^n e^{in\theta}$ is a \emph{computational mode}, 
+oscillating in sign at each time step.
+
+Although $|\rho|=1$ (neutral stability), this mode does not decay and can be excited by round-off or boundary errors, producing spurious oscillations.  
+Thus, when $\lambda=1$, the scheme is theoretically neutrally stable but practically unsuitable for computation unless additional filtering or special startup procedures are applied.
+
+\end{document}
