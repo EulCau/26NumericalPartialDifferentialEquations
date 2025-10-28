@@ -1,0 +1,244 @@
+\documentclass[12pt]{article}
+\usepackage{ctex}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{bm}
+\usepackage{hyperref}
+\geometry{a4paper, left=3cm, right=3cm, top=2.5cm, bottom=2.5cm}
+\renewcommand{\baselinestretch}{1.15}
+\parindent=2em
+
+\begin{document}
+    \noindent{\LARGE\textbf{HW05}}\vspace{1em}
+
+    \section*{题目 2.5.2}
+        对常系数线性热 (扩散) 差分格式常用 von Neumann (傅里叶) 稳定性分析. 设空间步长为 $h$, 令
+        \begin{equation*}
+            D_+D_- v_j = \frac{v_{j+1}-2v_j+v_{j-1}}{h^2}, \qquad \mu=\frac{k}{h^2}.
+        \end{equation*}
+        考虑单一傅里叶模态
+        \begin{equation*}
+            v_j^n = \xi^n e^{i\beta j h},
+        \end{equation*}
+        代入格式得放大因子 (amplification factor)
+        \begin{equation*}
+            G(\beta) \;=\; \frac{1 - 4(1-\theta)\mu \sin^2\!\bigl(\tfrac{\beta h}{2}\bigr)}{1 + 4\theta\mu \sin^2\!\bigl(\tfrac{\beta h}{2}\bigr)}.
+        \end{equation*}
+        稳定性的必要充分条件是对任意波数 $\beta$ 有 $|G(\beta)|\le1$. 由于分母 $1+4\theta\mu s>0$ (设 $s=\sin^2(\beta h/2)\ge0$) , 只需判断分子平方是否不超过分母平方:
+        \begin{equation*}
+            \bigl(1 - 4(1-\theta)\mu s\bigr)^2 \le \bigl(1 + 4\theta\mu s\bigr)^2.
+        \end{equation*}
+        展开并化简可得
+        \begin{equation*}
+            -8(1-2\theta)\mu s \le 0.
+        \end{equation*}
+        因为 $\mu s\ge0$, 上式对任意 $\mu,s$ 恒成立当且仅当
+        \begin{equation*}
+            1 - 2\theta \le 0 \quad\Longleftrightarrow\quad \theta \ge \tfrac12.
+        \end{equation*}
+        因此, 当 $\theta \ge \tfrac12$ 时该格式对所有 $h,k$ (即无条件) 稳定. \\
+        (注: $\theta=0$ 为显式 Euler, 需步长限制; $\theta=\tfrac12$ 为 Crank--Nicolson; $\theta=1$ 为后向 Euler, 都符合上面结论.)
+
+    \vspace{1em}
+    \hrule
+    \vspace{1em}
+
+    \section*{题目 2.5.3}
+        我们把时间步长记为 $k$, 空间步长为 $h$, 并用 $u_j^n$ 表示解析解在 $(x_j,t_n)$ 的值. 展开使用 Taylor 级数并替换时间导数为空间导数 (因 $u_t=u_{xx}$).
+
+        \subsubsection*{后向 Euler (Backward Euler) 格式:}
+            \begin{equation*}
+                \frac{v_j^{n+1}-v_j^n}{k} \;=\; \frac{v_{j+1}^{\,n+1}-2v_j^{\,n+1}+v_{j-1}^{\,n+1}}{h^2}.
+            \end{equation*}
+            将真解代入并展开:
+            \begin{equation*}
+                u_j^{n+1}=u_j^n + k u_t^n + \tfrac{k^2}{2} u_{tt}^n + \mathcal{O}(k^3).
+            \end{equation*}
+            空间中心差分在 $x$ 上的截断为二阶:
+            \begin{equation*}
+                \frac{u_{j+1}^{n+1}-2u_j^{n+1}+u_{j-1}^{n+1}}{h^2} = u_{xx}^{n+1} + \frac{h^2}{12}u_{xxxx}^{n+1} + \mathcal{O}(h^4).
+            \end{equation*}
+            使用 $u_t=u_{xx}$, 并将时间点 $n+1$ 用 $n$ 点展开 (可见会产生 $k$ 次项) . 合并后得到局部截断误差
+            \begin{equation*}
+                \tau = C_1 k + C_2 h^2 + \mathcal{O}(k^2+h^4),
+            \end{equation*}
+            即 $\tau = \mathcal{O}(k+h^2)$.
+
+        \subsubsection*{Crank--Nicolson 格式:}
+            \begin{equation*}
+                \frac{v_j^{n+1}-v_j^n}{k} \;=\; \frac{1}{2h^2}\Bigl( (v_{j+1}^{n+1}-2v_j^{n+1}+v_{j-1}^{n+1}) + (v_{j+1}^{n}-2v_j^{n}+v_{j-1}^{n})\Bigr).
+            \end{equation*}
+            同样用 Taylor 展开并替换 $u_t=u_{xx}$, 可以检验时间项的最低阶为 $k^2$ (因为时间中心差分抵消了一阶时间误差) , 空间项仍为 $h^2$. 因此
+            \begin{equation*}
+                \tau = \mathcal{O}(k^2 + h^2).
+            \end{equation*}
+
+        \subsubsection*{``悖论'' 解释}
+            理论上 Crank--Nicolson 在时间上是二阶精度, 比后向 Euler (时间一阶) 更高. 但在实际计算中有时后向 Euler 的数值解在若干时刻误差更小, 主要原因是两种方法的数值行为不同: 
+
+            \begin{itemize}
+                \item \textbf{数值耗散 (numerical diffusion) 差异:} 后向 Euler 是强耗散格式, 会衰减高频误差分量 (使解更平滑) . 对于高度平滑或扩散主导的问题, 这种额外耗散有时会降低瞬时的全局误差.
+                \item \textbf{振荡与相位误差:} Crank--Nicolson 是无耗散或低耗散的 (能量守恒型) , 它保留高频成分, 若初始条件或数值误差包含高频成分, Crank--Nicolson 可能产生可见振荡或相位误差, 从而在某些时刻使 $L^\infty$ 或 $L^2$ 误差较大.
+                \item \textbf{误差常数与问题尺度:} 高阶格式不保证在所有情形下误差绝对值都小. 截断误差的常数, 问题平滑性, 时间短期行为等都会影响哪种方法在某一给定时刻更优.
+            \end{itemize}
+
+            因此并非违背阶数结论: 长期收敛阶仍由理论支配, 但在具体数值实验 (有限 $k,h$) 与某些时刻下, 较强耗散的低阶法反而表现更稳健或在数值误差量度上更优.
+
+    \vspace{1em}
+    \hrule
+    \vspace{1em}
+
+    \section*{补充作业 1}
+        Lax--Wendroff 思路: 对时间做二阶 Taylor 展开, 然后把时间导数用空间导数 (与源项) 替换, 从而用空间中心差分近似所有空间导数, 保证整体二阶.
+
+        对点 $(x_j,t_n)$ 做 Taylor:
+        \begin{equation*}
+            u^{n+1}_j = u^n_j + k u_t^n + \tfrac{k^2}{2} u_{tt}^n + \mathcal{O}(k^3).
+        \end{equation*}
+        由 PDE 得
+        \begin{equation*}
+            u_t = -a u_x + f,
+        \end{equation*}
+        并进一步求
+        \begin{equation*}
+            u_{tt} = \partial_t(-a u_x + f) = -a_t u_x - a u_{xt} + f_t.
+        \end{equation*}
+        用 $u_{xt}=(u_t)_x = (-a u_x + f)_x = -a u_{xx} - a_x u_x + f_x$, 代回得
+        \begin{equation*}
+            u_{tt} = a^2 u_{xx} + a a_x u_x - a_t u_x + a f_x - f_t.
+        \end{equation*}
+        因此 (书写整理后)
+        \begin{equation*}
+            u^{n+1}_j = u^n_j + k(-a u_x + f)^n + \tfrac{k^2}{2}\bigl(a^2 u_{xx} + \text{第一阶导项与 } f\text{ 的导数}\bigr)^n + \mathcal{O}(k^3).
+        \end{equation*}
+
+        为了得到易于实现的离散格式, 用空间中心差分替换各空间导数 (均为二阶精度):
+        \begin{equation*}
+            u_x^n \approx \frac{u_{j+1}^n - u_{j-1}^n}{2h},\qquad u_{xx}^n \approx \frac{u_{j+1}^n - 2u_j^n + u_{j-1}^n}{h^2},
+        \end{equation*}
+        以及相应地对 $a,a_x,a_t,f_x,f_t$ 取解析值或用二阶差分近似 (若这些量可精确求得则更好) .
+
+        最终得到 Lax--Wendroff 型格式 (写出主要项):
+        \begin{align*}
+        v_j^{n+1} =\;   & v_j^n - \frac{a_j^n k}{2h}\bigl(v_{j+1}^n - v_{j-1}^n\bigr) + \frac{(a_j^n)^2 k^2}{2h^2}\bigl(v_{j+1}^n - 2v_j^n + v_{j-1}^n\bigr) \\
+                        & + k f_j^n + \frac{k^2}{2}\Bigl( a_j^n f_{x,j}^n - (f_t)_j^n + \text{含 } a_t,a_x\text{ 的项}\Bigr),
+        \end{align*}
+        其中 $a_j^n=a(x_j,t_n)$, $f_{x,j}^n$, $(f_t)_j^n$ 用二阶差商或已知解析表达式替代.
+
+        \paragraph{截断误差}
+            若 $a,f$ 和 $u$ 足够光滑, 且对 $a_t,a_x,f_t,f_x$ 也用二阶近似, 上式的局部截断误差为 $\mathcal{O}(k^3) + \mathcal{O}(h^2 k^2/h^2) = \mathcal{O}(k^3) + \mathcal{O}(h^2)$, 主项为 $\mathcal{O}(k^2 + h^2)$, 即局部截断为二阶 (关于时间与空间均为二阶一致的条件下) . 因此这是一个二阶精度的 Lax--Wendroff 格式 (在数值实现中应注意如何近似 $f_t,f_x,a_t,a_x$, 以保留二阶) .
+
+    \vspace{1em}
+    \hrule
+    \vspace{1em}
+
+    \section*{补充作业 2}
+        对纯对流方程, 解析沿特征守恒:
+        \begin{equation*}
+            u(x_j,t^{n+1}) = u(x_j - a k, t^n).
+        \end{equation*}
+        令 $\sigma = \dfrac{a k}{h}$, 则右侧点位于 $x_j - \sigma h$. 用以 $x_{j-1},x_j,x_{j+1}$ 为节点做二次 Lagrange 插值, 得到
+        \begin{equation*}
+            u(x_j-\sigma h,t^n) \approx \ell_{-1}(-\sigma)\,u_{j-1}^n +\ell_{0}(-\sigma)\,u_j^n + \ell_{1}(-\sigma)\,u_{j+1}^n,
+        \end{equation*}
+        其中 (令 $\xi=-\sigma$)
+        \begin{equation*}
+            \ell_{-1}(\xi)=\tfrac{\xi(\xi-1)}{2},\quad \ell_{0}(\xi)=1-\xi^2,\quad \ell_{1}(\xi)=\tfrac{\xi(\xi+1)}{2}.
+        \end{equation*}
+        代入 $\xi=-\sigma$, 化简系数得到显式格式:
+        \begin{equation*}
+            \boxed{\;u_j^{n+1} \;=\; \tfrac{\sigma(\sigma+1)}{2}\,u_{j-1}^n + (1-\sigma^2)\,u_j^n + \tfrac{\sigma(\sigma-1)}{2}\,u_{j+1}^n\; }.
+        \end{equation*}
+
+        \paragraph{截断误差}
+            二次插值对空间是三阶精度 (插值误差 $\mathcal{O}(h^3)$) , 而沿特征不引入时间截断 (因为我们直接沿特征取 $t^n$ 的值) . 因此在 $k$ 和 $h$ 任意关联下, 若仅由插值产生主误差, 则局部截断量级为
+            \begin{equation*}
+                \tau = \mathcal{O}(h^3).
+            \end{equation*}
+            注意: 当 $\sigma$ 不小 (即时间步与空间步比不合适) 时, 数值稳定性与全局误差还要受 CFL 等条件影响; 若把 $\sigma$ 随 $k$ 变化 (即 $\sigma$ 与 $k/h$ 相关) , 则常见的稳定性范围为 $|\sigma|\le1$ (以避免插值取值越过太远格点) , 具体分析请结合特定数值实验与稳定性分析.
+
+    \vspace{1em}
+    \hrule
+    \vspace{1em}
+
+    \section*{补充作业 3}
+        对系统, Lax--Wendroff 采用与标量情况相同的 Taylor 展开并用中心差分逼近:
+        \begin{equation*}
+            U_j^{n+1} = U_j^n + k U_t^n + \tfrac{k^2}{2} U_{tt}^n + \cdots.
+        \end{equation*}
+        由 PDE 得
+        \begin{equation*}
+            U_t = -A U_x,\qquad U_{tt} = A^2 U_{xx}.
+        \end{equation*}
+        因此离散格式 (主项) 为
+        \begin{equation*}
+            \boxed{\,U_j^{n+1} = U_j^n - \frac{k}{2h} A\bigl(U_{j+1}^n - U_{j-1}^n\bigr) + \frac{k^2}{2h^2} A^2\bigl(U_{j+1}^n - 2U_j^n + U_{j-1}^n\bigr)\, }.
+        \end{equation*}
+
+        \paragraph{稳定性分析}
+            若 $A$ 可对角化: $A=R\Lambda R^{-1}$, 其中 $\Lambda=\mathrm{diag}(\lambda_1,\dots,\lambda_p)$ (实特征值, 双曲条件) . 将上式左乘 $R^{-1}$ 并引入特征变量可把系统分解为 $p$ 个相互独立的标量 Lax--Wendroff 格式 (每个波速为 $\lambda_i$) . 因此系统的稳定性约化到每个标量情形: 对每个特征值 $\lambda_i$, 标量 Lax--Wendroff 的稳定条件为 CFL 条件
+            \begin{equation*}
+                \bigl|\lambda_i\bigr|\frac{k}{h} \le 1,
+            \end{equation*}
+            或更严格地说, 要求最大特征速度满足
+            \begin{equation*}
+                \max_i |\lambda_i|\,\frac{k}{h} \le 1.
+            \end{equation*}
+            因此总体条件为基于谱半径的 CFL 条件:
+            \begin{equation*}
+                \boxed{\; \rho(A)_\infty \,\frac{k}{h} \ \text{不得过大, 典型要求} \ \max_i|\lambda_i|\frac{k}{h}\le 1\; }.
+            \end{equation*}
+            (若 $A$ 不易对角化, 需用 Jordan 分解与能量估计处理, 但结论仍是以特征速度为主的 CFL 约束. )
+
+    \vspace{1em}
+    \hrule
+    \vspace{1em}
+
+    \section*{补充作业 4}
+        首先求 $A$ 的特征值與特征向量. 特征方程 $\det(A-\lambda I)=\lambda^2-1=0$, 故
+        \begin{equation*}
+            \lambda_1=1,\qquad \lambda_2=-1.
+        \end{equation*}
+        $A$ 可由正交矩阵对角化: 设
+        \begin{equation*}
+            R=\frac{1}{\sqrt2}\begin{pmatrix}1 & 1\\ 1 & -1\end{pmatrix}, \qquad R^{-1}=R^{T},
+        \end{equation*}
+        则
+        \begin{equation*}
+            A = R \begin{pmatrix}1 & 0\\ 0 & -1\end{pmatrix} R^{-1}.
+        \end{equation*}
+
+        迎风格式的常用写法是利用特征分解将系统化为沿每一特征的标量方程, 然后分别采用相应方向的上风差分; 一个常见的矩阵表达为 (保守的向量迎风)
+        \begin{equation*}
+            U_j^{n+1} = U_j^n - \frac{k}{h}\Bigl(A^+ (U_j^n - U_{j-1}^n) + A^- (U_{j+1}^n - U_j^n)\Bigr),
+        \end{equation*}
+        其中 $A^\pm$ 是 $A$ 的正负特征值部分的矩阵投影:
+        \begin{equation*}
+            A^\pm = R \,\Lambda^\pm\, R^{-1},\qquad \Lambda^+ = \mathrm{diag}(\max(\lambda_i,0)),\ \Lambda^-=\mathrm{diag}(\min(\lambda_i,0)).
+        \end{equation*}
+
+        对本题, $\Lambda^+ = \mathrm{diag}(1,0)$, $\Lambda^-=\mathrm{diag}(0,-1)$. 等价地用符号函数得到
+        \begin{equation*}
+            |A| = R\,\mathrm{diag}(|\lambda_i|)\,R^{-1} = R I R^{-1} = I,
+        \end{equation*}
+        于是
+        \begin{equation*}
+            A^+ = \tfrac12(A + |A|) = \tfrac12(A + I),\qquad A^- = \tfrac12(A - |A|) = \tfrac12(A - I).
+        \end{equation*}
+        对给定 $A$ 计算得到
+        \begin{equation*}
+            A^+ = \frac{1}{2}\begin{pmatrix}1 & -1\\ -1 & 1\end{pmatrix},\qquad A^- = \frac{1}{2}\begin{pmatrix}-1 & -1\\ -1 & -1\end{pmatrix}.
+        \end{equation*}
+        因此迎风格式显式写为
+        \begin{equation*}
+            \boxed{\,U_j^{n+1} = U_j^n - \frac{k}{h}\Bigl( A^+ (U_j^n-U_{j-1}^n) + A^- (U_{j+1}^n-U_j^n)\Bigr)\, }.
+        \end{equation*}
+        按分量展开即可用于数值实现. 也可以在特征变量 $W=R^{-1}U$ 下写成两条独立的标量迎风格式: 对于特征速度 $+1$ 用左向迎风 (取 $W_j - W_{j-1}$) , 对于速度 $-1$ 用右向迎风 (取 $W_{j+1}-W_j$) .
+
+        \paragraph{稳定性}
+            在特征分解后, 要求每个标量迎风子问题满足其 CFL 条件, 即
+            \begin{equation*}
+                \max_i |\lambda_i|\,\frac{k}{h} \le 1 \quad\Longrightarrow\quad \frac{k}{h}\le 1
+            \end{equation*}
+            (因本题特征值为 $\pm1$) .
+\end{document}
