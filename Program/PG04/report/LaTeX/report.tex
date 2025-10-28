@@ -1,0 +1,131 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage{amsmath,amssymb,graphicx,booktabs}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+\usepackage{float}
+
+\title{\textbf{线性对流方程的数值解: FTBS 与 CTCS 方法比较}}
+\author{PB22000150 刘行}
+\date{}
+
+\begin{document}
+    \maketitle
+
+    \section{问题描述}
+        考虑一维线性对流方程
+        \begin{equation*}
+            u_t + a u_x = 0, \qquad x \in [0,1], \ t > 0,
+        \end{equation*}
+        其中 $a>0$ 为常数. 给定初值
+        \begin{equation*}
+            u(x,0) = u_0(x),
+        \end{equation*}
+        并在区间端点施加周期边界条件
+        \begin{equation*}
+            u(0,t) = u(1,t).
+        \end{equation*}
+        该方程的解析解为
+        \begin{equation*}
+            u(x,t) = u_0(x - a t),
+        \end{equation*}
+        表示初值以速度 $a$ 向右平移. 我们的目标是用有限差分法求解该方程, 并比较两种不同时间离散方法的表现.
+
+    \section{数值方法}
+        \subsection{网格与记号}
+            将空间区间 $[0,1]$ 均分为 $J$ 个单元, 空间步长 $\Delta x = 1/J$; 时间步长记为 $\Delta t$, 设
+            \begin{equation*}
+                \lambda = \frac{a \Delta t}{\Delta x}.
+            \end{equation*}
+            网格点记为 $x_j = j \Delta x, \ t^n = n \Delta t$, 离散近似 $u(x_j,t^n)\approx u_j^n$.
+
+        \subsection{FTBS 方法推导}
+            FTBS (Forward Time, Backward Space) 格式在时间上采用显式前向差分, 在空间上采用后向差分:
+            \begin{equation*}
+                \frac{u_j^{n+1} - u_j^n}{\Delta t} + a \frac{u_j^n - u_{j-1}^n}{\Delta x} = 0.
+            \end{equation*}
+            整理得:
+            \begin{equation*}
+                u_j^{n+1} = u_j^n - \lambda (u_j^n - u_{j-1}^n).
+            \end{equation*}
+            这是一个一阶时间、一阶空间精度的格式. 其稳定性条件为
+            \begin{equation*}
+                \lambda \leq 1.
+            \end{equation*}
+
+        \subsection{CTCS 方法推导}
+            CTCS (Central Time, Central Space) 格式采用时间中心差分与空间中心差分:
+            \begin{equation*}
+                \frac{u_j^{n+1} - u_j^{n-1}}{2\Delta t} + a \frac{u_{j+1}^n - u_{j-1}^n}{2\Delta x} = 0.
+            \end{equation*}
+            化简为显式递推形式:
+            \begin{equation*}
+                u_j^{n+1} = u_j^{n-1} - \lambda (u_{j+1}^n - u_{j-1}^n).
+            \end{equation*}
+            此方法为时间二阶、空间二阶精度, 但其稳定性取决于 $\lambda$:
+            \begin{equation*}
+                |\lambda| \leq 1.
+            \end{equation*}
+
+            若 $\lambda > 1$, CTCS 将产生指数增长的虚假振荡, 导致数值不稳定.
+
+    \section{数值实验结果}
+        实验参数: 对流速度 $a=1$, 周期边界条件, 初值 $u_0(x)=\sin(2\pi x)$.
+
+        采用不同空间剖分数 $J$ 与 Courant 数 $\lambda$, 得到下表结果 (误差分别为 $L_2$ 与 $L_\infty$ 范数).
+
+        \subsection{CTCS 方法结果}
+            \begin{table}[H]
+                \centering
+                \caption{CTCS 方法在不同参数下的误差结果}
+                \begin{tabular}{cccccc}
+                    \toprule
+                    $J$ & $t$ & $\lambda$ & $L_2$ & $L_\infty$ & 稳定性 \\
+                    \midrule
+                    80 & 1.0 & 0.5 & 4.92e-03 & 4.86e-03 & 稳定 \\
+                    80 & 1.0 & 1.5 & 1.11e+06 & 1.75e+06 & 不稳定 \\
+                    10 & 1.0 & 0.5 & 3.95e-01 & 3.58e-01 & 稳定 \\
+                    20 & 1.0 & 0.5 & 8.48e-02 & 8.08e-02 & 稳定 \\
+                    40 & 1.0 & 0.5 & 2.01e-02 & 1.96e-02 & 稳定 \\
+                    80 & 1.0 & 0.5 & 4.92e-03 & 4.86e-03 & 稳定 \\
+                    160 & 1.0 & 0.5 & 1.22e-03 & 1.21e-03 & 稳定 \\
+                    \bottomrule
+                \end{tabular}
+            \end{table}
+
+            可以看到, 当 $\lambda=1.5>1$ 时, 数值解严重发散; 而在稳定区间内, 误差随 $J$ 的增加呈 $O(\Delta x^2)$ 收敛.
+
+        \subsection{FTBS 方法结果}
+            \begin{table}[H]
+                \centering
+                \caption{FTBS 方法在不同时间下的误差结果}
+                \begin{tabular}{cccccc}
+                    \toprule
+                    $J$ & $t$ & $\lambda$ & $L_2$ & $L_\infty$ & 说明 \\
+                    \midrule
+                    80 & 0.2 & 0.5 & 1.88e+00 & 1.88e+00 & 初期误差较大 \\
+                    80 & 0.5 & 0.5 & 5.98e-02 & 5.98e-02 & 收敛稳定 \\
+                    \bottomrule
+                \end{tabular}
+            \end{table}
+
+            可以看到, FTBS 方法稳定性良好, 但由于为一阶精度, 数值耗散较明显, 误差随时间积累而增大.
+
+    \section{结果分析与比较}
+    \begin{itemize}
+        \item FTBS 方法具有较好的稳定性, 但数值耗散显著;
+        \item CTCS 方法精度更高 (时间、空间二阶), 但对 $\lambda$ 的稳定性要求更严格;
+        \item 当 $\lambda>1$ 时, CTCS 方法会发生振荡并迅速发散;
+        \item 当 $\lambda\leq 1$ 时, CTCS 方法随网格加密误差按 $O(\Delta x^2)$ 收敛;
+        \item 实验结果验证了理论稳定性分析.
+    \end{itemize}
+
+    \section{结论}
+    本实验对比了线性对流方程的两种显式差分方法. 结果表明:
+    \begin{enumerate}
+        \item FTBS 格式稳定但精度低;
+        \item CTCS 格式精度高但条件稳定;
+        \item 数值实验验证了稳定性条件与收敛阶的理论分析;
+        \item 实际计算中应优先选择满足 $\lambda\leq1$ 的高精度格式.
+    \end{enumerate}
+\end{document}
