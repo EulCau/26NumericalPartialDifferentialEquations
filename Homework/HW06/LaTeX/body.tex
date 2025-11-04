@@ -1,0 +1,211 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\geometry{margin=1in}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+    \textbf{HW06}\vspace{0.5em}
+
+    \section*{4.1.1}
+        考虑傅里叶模态$u(x,t)=e^{i\omega x}\widehat u(\omega,t)$，代入方程$u_t = u_{xx} + 100u$得：
+        \begin{equation*}
+            \frac{d}{dt}\widehat u(\omega,t)=(100-\omega^2)\widehat u(\omega,t)
+        \end{equation*}
+        精确解为$\widehat u(\omega,t)=e^{(100-\omega^2)t}\widehat f(\omega)$。
+
+        分两种情形分析舍入误差：
+
+        情形A：初始数据存在舍入误差$\delta$，即实际初始振幅为$\widehat f(\omega)+\delta$。最终时刻$t$的数值解为：
+        \begin{equation*}
+            \widehat u_{\text{num}}(\omega,t)=e^{(100-\omega^2)t}(\widehat f(\omega)+\delta)
+        \end{equation*}
+        相对于精确解$\widehat u(\omega,t)=e^{(100-\omega^2)t}\widehat f(\omega)$的相对误差为：
+        \begin{equation*}
+            \frac{|\widehat u_{\text{num}}(\omega,t)-\widehat u(\omega,t)|}{|\widehat u(\omega,t)|}
+            =\frac{|\delta|}{|\widehat f(\omega)|}
+        \end{equation*}
+        要保证相对误差不超过$1\%$，需满足：
+        \begin{equation*}
+            \frac{|\delta|}{|\widehat f(\omega)|}\le 0.01
+        \end{equation*}
+
+        情形B：时间推进过程中产生局部舍入误差$\varepsilon(s)$。在时间$s$引入的误差到最终时刻$t$会被放大$e^{(100-\omega^2)(t-s)}$倍。
+        最坏情况下（$\omega=0$），最大放大因子为$e^{100\cdot 2}=e^{200}$。
+        为保证最终相对误差不超过$1\%$，保守条件要求每次局部绝对误差$\varepsilon$满足：
+        \begin{equation*}
+            \varepsilon \le 0.01\cdot e^{-200}|u(\cdot,2)|
+        \end{equation*}
+        其中$e^{-200}\approx 1.38\times10^{-87}$。
+
+    \section*{4.2.1}
+        考虑偏微分方程$\frac{\partial u}{\partial t}=\sum_{j=0}^4 a_j\frac{\partial^j u}{\partial x^j}$。
+        设解的形式为$u(x,t)=e^{i\omega x}\widehat u(\omega,t)$，代入方程得：
+        \begin{equation*}
+            \frac{d}{dt}\widehat u(\omega,t)=\kappa(\omega)\widehat u(\omega,t)
+        \end{equation*}
+        其中符号函数$\kappa(\omega)=\sum_{j=0}^4 a_j(i\omega)^j$。
+
+        问题良定的充要条件是：存在实常数$\alpha$，使得对所有实$\omega$有：
+        \begin{equation*}
+            \operatorname{Re}\kappa(\omega)\le\alpha
+        \end{equation*}
+
+        展开$\kappa(\omega)$的实部：
+        \begin{align*}
+            \kappa(\omega)&=a_0 + i a_1 \omega - a_2 \omega^2 - i a_3 \omega^3 + a_4 \omega^4 \\
+            \operatorname{Re}\kappa(\omega)&=\operatorname{Re}a_0 - \operatorname{Re}a_2\omega^2 + \operatorname{Re}a_4\omega^4
+        \end{align*}
+
+        当$\operatorname{Re}a_4<0$时，$\operatorname{Re}\kappa(\omega)\sim \operatorname{Re}a_4\omega^4\to -\infty$（当$|\omega|\to\infty$），
+        因此$\operatorname{Re}\kappa(\omega)$在$\mathbb{R}$上有上界，问题总是良定的。
+
+    \section*{补充作业1}
+        在时空单元$[x_{j-1/2},x_{j+1/2}]\times[t_n,t_{n+1}]$上积分PDE $u_t = u_{xx} + f(x,t)$：
+        \begin{equation*}
+            \iint u_t dxdt = \iint u_{xx} dxdt + \iint f(x,t) dxdt
+        \end{equation*}
+
+        左端：
+        \begin{equation*}
+            \iint u_t dxdt = \int_{x_{j-1/2}}^{x_{j+1/2}} [u(x,t_{n+1})-u(x,t_n)] dx
+            \approx h(u_j^{n+1}-u_j^n)
+        \end{equation*}
+
+        右端第一项：
+        \begin{equation*}
+            \iint u_{xx} dxdt = \int_{t_n}^{t_{n+1}} [u_x(x_{j+1/2},t)-u_x(x_{j-1/2},t)] dt
+        \end{equation*}
+        用$\theta$加权近似时间积分：
+        \begin{equation*}
+            \approx \tau[\theta(u_x(x_{j+1/2},t_{n+1})-u_x(x_{j-1/2},t_{n+1})) + (1-\theta)(u_x(x_{j+1/2},t_n)-u_x(x_{j-1/2},t_n))]
+        \end{equation*}
+        用中心差分近似空间导数：
+        \begin{equation*}
+            u_x(x_{j+1/2},t)\approx \frac{u_{j+1}(t)-u_j(t)}{h}
+        \end{equation*}
+        于是：
+        \begin{equation*}
+            \iint u_{xx} dxdt \approx \frac{\tau}{h}[\theta(\delta_x^2 u_j^{n+1}) + (1-\theta)(\delta_x^2 u_j^n)]
+        \end{equation*}
+        其中$\delta_x^2 u_j = u_{j+1}-2u_j+u_{j-1}$。
+
+        右端第二项：
+        \begin{equation*}
+            \iint f(x,t) dxdt \approx h\tau[\theta f_j^{n+1} + (1-\theta)f_j^n]
+        \end{equation*}
+
+        整理得$\theta$-格式：
+        \begin{equation*}
+            \frac{u_j^{n+1}-u_j^n}{\tau} = \frac{1}{h^2}[\theta\delta_x^2 u_j^{n+1} + (1-\theta)\delta_x^2 u_j^n] + \theta f_j^{n+1} + (1-\theta)f_j^n
+        \end{equation*}
+
+        截断误差分析：
+        空间中心差分误差：$\delta_x^2 u_j = h^2 u_{xx} + \frac{h^4}{12}u_{xxxx} + O(h^6)$
+        时间差商：$\frac{u_j^{n+1}-u_j^n}{\tau} = u_t + \frac{\tau}{2}u_{tt} + O(\tau^2)$
+        当$\theta=\frac{1}{2}$时，时间截断误差为$O(\tau^2)$，空间截断误差为$O(h^2)$。
+
+    \section*{补充作业2}
+        (A) 在时空单元$[t_{n-1},t_{n+1}]\times[x_{j-1/2},x_{j+1/2}]$上积分PDE $u_t = u_{xx}$：
+        \begin{equation*}
+            \iint u_t dxdt = \iint u_{xx} dxdt
+        \end{equation*}
+
+        左端：
+        \begin{equation*}
+            \iint u_t dxdt = \int_{x_{j-1/2}}^{x_{j+1/2}} [u(x,t_{n+1})-u(x,t_{n-1})] dx
+            = h(\overline u_j^{n+1}-\overline u_j^{n-1})
+        \end{equation*}
+        其中$\overline u_j^n = \frac{1}{h}\int_{x_{j-1/2}}^{x_{j+1/2}} u(x,t_n) dx$为单元平均。
+
+        右端：
+        \begin{equation*}
+            \iint u_{xx} dxdt = \int_{t_{n-1}}^{t_{n+1}} [u_x(x_{j+1/2},t)-u_x(x_{j-1/2},t)] dt
+        \end{equation*}
+        用时间中点近似：
+        \begin{equation*}
+            \approx 2\tau[u_x(x_{j+1/2},t_n)-u_x(x_{j-1/2},t_n)]
+        \end{equation*}
+        用中心差分近似空间导数：
+        \begin{equation*}
+            u_x(x_{j+1/2},t_n)\approx \frac{\overline u_{j+1}^n - \overline u_j^n}{h}
+        \end{equation*}
+        于是：
+        \begin{equation*}
+            \iint u_{xx} dxdt \approx \frac{2\tau}{h}(\overline u_{j+1}^n - 2\overline u_j^n + \overline u_{j-1}^n)
+        \end{equation*}
+
+        得到格式：
+        \begin{equation*}
+            \frac{\overline u_j^{n+1} - \overline u_j^{n-1}}{2\tau} = \frac{\overline u_{j+1}^n - 2\overline u_j^n + \overline u_{j-1}^n}{h^2}
+        \end{equation*}
+
+        截断误差分析：
+        时间方向泰勒展开：
+        \begin{align*}
+            u(x_j,t_{n+1}) &= u + \tau u_t + \frac{\tau^2}{2}u_{tt} + \frac{\tau^3}{6}u_{ttt} + O(\tau^4) \\
+            u(x_j,t_{n-1}) &= u - \tau u_t + \frac{\tau^2}{2}u_{tt} - \frac{\tau^3}{6}u_{ttt} + O(\tau^4)
+        \end{align*}
+        于是：
+        \begin{equation*}
+            \frac{u(x_j,t_{n+1})-u(x_j,t_{n-1})}{2\tau} = u_t + \frac{\tau^2}{6}u_{ttt} + O(\tau^4)
+        \end{equation*}
+        空间方向：
+        \begin{equation*}
+            \frac{u(x_{j+1},t_n)-2u(x_j,t_n)+u(x_{j-1},t_n)}{h^2} = u_{xx} + \frac{h^2}{12}u_{xxxx} + O(h^4)
+        \end{equation*}
+        由PDE $u_t=u_{xx}$，局部截断误差为：
+        \begin{equation*}
+            \text{LTE} = \frac{\tau^2}{6}u_{ttt} - \frac{h^2}{12}u_{xxxx} + O(\tau^4 + h^4)
+        \end{equation*}
+        故格式精度为$O(\tau^2 + h^2)$。
+
+        (B) 考虑三点线性组合$L_h[u]_j = \alpha u_{j-1} + \beta u_j + \gamma u_{j+1}$逼近$u_{xx}(x_j)$。
+        泰勒展开：
+        \begin{align*}
+            u_{j\pm1} &= u_j \pm h u_x + \frac{h^2}{2}u_{xx} \pm \frac{h^3}{6}u_{xxx} + \frac{h^4}{24}u_{xxxx} + O(h^5) \\
+            L_h[u]_j &= (\alpha+\beta+\gamma)u_j + (\gamma-\alpha)h u_x + \frac{\alpha+\gamma}{2}h^2 u_{xx} \\
+            &\quad + \frac{\gamma-\alpha}{6}h^3 u_{xxx} + \frac{\alpha+\gamma}{24}h^4 u_{xxxx} + O(h^5)
+        \end{align*}
+        要逼近$u_{xx}$，需满足：
+        \begin{align*}
+            \alpha+\beta+\gamma &= 0 \\
+            \gamma-\alpha &= 0 \\
+            \frac{\alpha+\gamma}{2}h^2 &= 1
+        \end{align*}
+        解得$\alpha=\gamma=\frac{1}{h^2}$，$\beta=-\frac{2}{h^2}$。
+        此时$u_{xxx}$项系数为$0$，但$u_{xxxx}$项系数为$\frac{h^2}{12}$，故误差主项为$O(h^2)$，无法达到三阶精度。
+
+    \section*{补充作业3}
+        方程$u_t = \partial_x(\kappa(x) u_x)$，其中$\kappa(x)=0.1+\sin^2 x$。
+
+        定义空间节点$x_j=jh$，时间节点$t_n=n\tau$，界面点$x_{j+1/2}=(j+1/2)h$。
+        界面扩散系数取精确值：
+        \begin{equation*}
+            \kappa_{j+1/2} = \kappa(x_{j+1/2}) = 0.1 + \sin^2(x_{j+1/2})
+        \end{equation*}
+        数值通量：
+        \begin{equation*}
+            F_{j+1/2}^n = \kappa_{j+1/2}\frac{u_{j+1}^n - u_j^n}{h}
+        \end{equation*}
+        空间离散算子：
+        \begin{equation*}
+            \mathcal{L}_h(u^n)_j = \frac{F_{j+1/2}^n - F_{j-1/2}^n}{h}
+            = \frac{1}{h}\left[\kappa_{j+1/2}\frac{u_{j+1}^n-u_j^n}{h} - \kappa_{j-1/2}\frac{u_j^n-u_{j-1}^n}{h}\right]
+        \end{equation*}
+        Crank-Nicolson时间离散：
+        \begin{equation*}
+            \frac{u_j^{n+1}-u_j^n}{\tau} = \frac{1}{2}[\mathcal{L}_h(u^{n+1})_j + \mathcal{L}_h(u^n)_j]
+        \end{equation*}
+
+        精度分析：
+        空间离散误差：在界面$x_{j+1/2}$处，
+        \begin{equation*}
+            \kappa_{j+1/2}\frac{u_{j+1}-u_j}{h} = \kappa(x_{j+1/2})[u_x(x_{j+1/2}) + O(h^2)]
+        \end{equation*}
+        故通量近似误差为$O(h^2)$，空间离散整体误差为$O(h^2)$。
+        时间离散采用Crank-Nicolson格式，截断误差为$O(\tau^2)$。
+        综上，格式精度为$O(\tau^2 + h^2)$。
+
+\end{document}
