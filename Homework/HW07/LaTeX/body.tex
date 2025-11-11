@@ -1,0 +1,295 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\geometry{margin=1in}
+\setlength{\parindent}{0pt}
+\setlength{\headheight}{15pt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{PB22000150 刘行}
+\fancyhead[C]{NPDE 第 07 次作业}
+\fancyhead[R]{第~\thepage~页}
+
+\begin{document}
+    {\LARGE \textbf{HW07}}\vspace{0.5em}
+
+    \section*{4.3.1}
+                取能量
+        \begin{equation*}
+            E\left(t\right)=\left\lVert u\left(\cdot, t\right) \right\rVert_{L^{2}}^{2}=\int u\left(x, t\right)^{\ast}u\left(x,t\right)\,\mathrm{d}x.
+        \end{equation*}
+        则有
+        \begin{equation*}
+            \dot E\left(t\right)=2 \, \Re\left\langle u_{t},u\right\rangle = 2 \,\Re\int u^{\ast}\left(A u_{x}+Bu\right) \, \mathrm{d}x.
+        \end{equation*}
+
+        \textbf{(1) 关于 $A u_{x}$ 项:}
+        \begin{equation*}
+            \int u^{\ast}A u_{x} \, \mathrm{d}x.
+        \end{equation*}
+        当 $A$ 为常矩阵时, 若 $A=A^{\ast}$, 则
+        \begin{equation*}
+            u^{\ast}A u_{x}=\tfrac12 \partial_{x}\left(u^{\ast}A u\right),
+        \end{equation*}
+        于是
+        \begin{equation*}
+            2\,\Re\int u^{\ast}A u_{x} \, \mathrm{d}x = \Re\int \partial_{x}\left(u^{\ast}A u\right) \, \mathrm{d}x = \Re\,[u^{\ast}A u]_{\text{边界}}.
+        \end{equation*}
+        在周期边界, 无穷远衰减或零通量边界条件下, 该边界项为零.
+        因此要保证能量守恒, 必须有
+        \begin{equation*}
+            \boxed{A=A^{\ast}.}
+        \end{equation*}
+
+        \textbf{(2) 关于 $Bu$ 项:}
+        \begin{equation*}
+            2 \, \Re\int u^{\ast}Bu \, \mathrm{d}x = \int u^{\ast}\left(B+B^{\ast}\right)u \, \mathrm{d}x.
+        \end{equation*}
+        要使该项恒为零, 必须且只需
+        \begin{equation*}
+            \boxed{B^{\ast} = -B.}
+        \end{equation*}
+
+        \textbf{(3) 结论:}
+
+        在适当的边界条件下 (如周期, 衰减或零通量), 系统
+        \begin{equation*}
+            u_{t} = A u_{x} + B
+        \end{equation*}
+        能量守恒当且仅当
+        \begin{equation*}
+            \boxed{A\ \text{自伴},\qquad B\ \text{反自伴}.}
+        \end{equation*}
+        等价地, 生成算子
+        \begin{equation*}
+            L=A\partial_{x}+B
+        \end{equation*}
+        在 $L^{2}$ 空间中反自伴.
+
+
+    \section*{4.4.1}
+        设能量
+        \begin{equation*}
+            E\left(t\right) = \left\lVert u\left(\cdot,t\right) \right\rVert^{2} = \left\langle u,u\right\rangle.
+        \end{equation*}
+        对时间求导得
+        \begin{equation*}
+            \frac{1}{2}\frac{\mathrm{d}}{\mathrm{d}t}\left\lVert u\right\rVert^{2} = \Re\left\langle u_{t},u\right\rangle = \Re\left\langle A u_{xx},u\right\rangle.
+        \end{equation*}
+        对右端分部积分 (假设边界项为零):
+        \begin{equation*}
+            \Re\left\langle A u_{xx},u\right\rangle = -\Re\left\langle A u_{x},u_{x}\right\rangle.
+        \end{equation*}
+        若 $A$ 是常矩阵且自伴正定, 即 $A=A^{\ast}$, 且存在 $\alpha>0$ 使得
+        \begin{equation*}
+            \left\langle Av,v\right\rangle\ge \alpha \left\lVert v \right\rVert^{2},
+        \end{equation*}
+        代入得,
+        \begin{equation*}
+            \frac{\mathrm{d}}{\mathrm{d}t}\left\lVert u\right\rVert^{2}+2\alpha\left\lVert u_{x} \right\rVert^{2}\le 0.
+        \end{equation*}
+        积分 $t\in\left[0,T\right]$ 得
+        \begin{equation*}
+            \left\lVert u\left(\cdot,t\right)\right\rVert^{2} + 2\alpha\int_{0}^{t}\left\lVert u_{x}\left(\cdot,\xi\right) \right\rVert^{2} \, \mathrm{d}\xi \le \left\lVert u\left(\cdot,0\right) \right\rVert^{2}.
+        \end{equation*}
+        因此式(4.4.9)成立, 可取
+        \begin{equation*}
+            \boxed{\delta = 2\alpha = 2\lambda_{\min}\left(A\right),\qquad K = 1.}
+        \end{equation*}
+
+    \section*{4.4.2}
+        考虑系统
+        \begin{equation*}
+            u_{t}=A u_{xx}+B u_{x}+C u,
+        \end{equation*}
+        其中 $B=B^{\ast}$, $C^{\ast}=-C$. 同样有
+        \begin{equation*}
+            \frac{1}{2}\frac{\mathrm{d}}{\mathrm{d}t}\left\lVert u \right\rVert^{2} = \Re\left\langle A u_{xx},u\right\rangle + \Re\left\langle B u_{x},u\right\rangle + \Re\left\langle C u, u\right\rangle.
+        \end{equation*}
+        对各项分析:
+
+        \begin{itemize}
+            \item 第一项: 与4.4.1相同,
+            \begin{equation*}
+                \Re\left\langle Au_{xx}, u\right\rangle = -\Re\left\langle Au_{x}, u_{x}\right\rangle \le -\alpha\left\lVert u_{x} \right\rVert^{2}.
+            \end{equation*}
+            \item 第二项: 由于$B$为常矩阵且$B=B^{\ast}$,
+            \begin{equation*}
+                \Re\left\langle Bu_{x}, u\right\rangle = \frac{1}{2} \Re\int \partial_{x}\left(u^{\ast} Bu\right) \, \mathrm{d}x=0,
+            \end{equation*}
+            边界项为零.
+            \item 第三项: 因$C^{\ast}=-C$,
+            \begin{equation*}
+                u^{\ast}Cu\text{为纯虚数}\Rightarrow \Re\left\langle Cu, u\right\rangle=0.
+            \end{equation*}
+        \end{itemize}
+
+        因此
+        \begin{equation*}
+            \frac{\mathrm{d}}{\mathrm{d}t}\left\lVert u\right\rVert^{2}+2\alpha\left\lVert u_{x} \right\rVert^{2}\le 0,
+        \end{equation*}
+        与4.4.1完全相同. 积分得
+        \begin{equation*}
+            \left\lVert u\left(\cdot,t\right)\right\rVert^{2}+2\alpha\int_{0}^{t}\left\lVert u_{x}\left(\cdot,\xi\right) \right\rVert^{2} \, \mathrm{d}\xi \le \left\lVert u\left(\cdot,0\right) \right\rVert^{2}.
+        \end{equation*}
+        故式(4.4.9)依然成立, 并可取相同的常数
+        \begin{equation*}
+            \boxed{\delta=2\lambda_{\min}\left(A\right),\qquad K=1.}
+        \end{equation*}
+
+    \section*{4.5.1}
+        对系统 $u_{t} = A \, u_{x}$ 进行空间傅里叶变换:
+        \begin{equation*}
+            \widehat{u}_{t} = i\omega A \, \widehat{u}.
+        \end{equation*}
+        因此其符号矩阵为 $\widehat{P}\left(i\omega\right) = i\omega A$, 特征值为
+        \begin{equation*}
+            \lambda = i\omega \mu,
+        \end{equation*}
+        其中 $\mu$ 是矩阵 $A$ 的特征值. 若 $\mu = a + ib$, 则
+        \begin{equation*}
+            \Re\lambda = \Re\left(i\omega\mu\right) = -\omega \, \Im\mu = -\omega b.
+        \end{equation*}
+        若 $b \neq 0$, 即 $A$ 存在非实特征值, 则可以改变 $\omega$ 的符号, 使 $\Re\lambda$ 取得任意大的正值, 从而不存在有限的 $\alpha$ 使得 $\Re\lambda \le \alpha$ 对所有 $\omega$ 成立.
+
+        若 $b=0$, 即 $A$ 的特征值全为实数, 则 $\Re\lambda = 0$, 此时 Petrovsky 条件在 $\alpha = 0$ 时已经成立.
+
+        因此不可能出现 ``当 $\alpha>0$ 时成立而当 $\alpha=0$ 不成立'' 的情况. 结论是:
+
+        \begin{equation*}
+            \boxed{\text{若 }A\text{ 的特征值全实, 则条件在 }\alpha=0\text{ 时成立; 否则对任意 }\alpha\text{ 都不成立.}}
+        \end{equation*}
+
+    \section*{4.5.2}
+        给定系统
+        \begin{equation*}
+            u_{t} =
+            \begin{bmatrix}
+                1 & 10\\
+                0 & 2
+            \end{bmatrix}
+            u_{x},
+        \end{equation*}
+        有
+        \begin{equation*}
+            \widehat{P}\left(i\omega\right) = i\omega A, \qquad
+            A =
+            \begin{bmatrix}
+                1 & 10\\
+                0 & 2
+            \end{bmatrix}.
+        \end{equation*}
+
+        根据定理 4.5.7, 我们需要找到一个正定厄米矩阵 $\widehat{H}\left(\omega\right)$ (为方便起见记为 $H$, 与 $\omega$ 无关)使得
+        \begin{equation*}
+            H A = A^{\ast} H.
+        \end{equation*}
+        此时
+        \begin{equation*}
+            H\,\widehat{P}\left(i\omega\right) + \widehat{P}\left(i\omega\right)^{\ast} H = i\omega\left(HA - A^{\ast} H\right) = 0 \le 2\alpha H,
+        \end{equation*}
+        因此可以取 $\alpha = 0$.
+
+        设
+        \begin{equation*}
+            H =
+            \begin{bmatrix}
+                h_{11} & h_{12}\\
+                h_{12} & h_{22}
+            \end{bmatrix}, \qquad H = H^{\ast}.
+        \end{equation*}
+        代入 $HA = A^{\top} H$, 得到方程组:
+        \begin{equation*}
+            \begin{cases}
+                10h_{11} + 2h_{12} = h_{12},\\
+                h_{12} = 10h_{11} + 2h_{12}.
+            \end{cases}
+        \end{equation*}
+        由此解得 $h_{12} = -10h_{11}$, 而 $h_{22}$ 可任意取.
+        为了保证 $H$ 正定, 只需取 $h_{22} > 100h_{11}$.
+        例如, 取 $h_{11}=1$, $h_{22}=101$, 得
+        \begin{equation*}
+            H =
+            \begin{bmatrix}
+                1 & -10\\
+                -10 & 101
+            \end{bmatrix}.
+        \end{equation*}
+
+        显然 $H$ 是厄米正定矩阵, 且满足 $H A = A^{\top} H$.
+        于是有
+        \begin{equation*}
+            H\,\widehat{P}\left(i\omega\right) + \widehat{P}\left(i\omega\right)^{\ast} H = 0 \le 2\alpha H \quad \left(\alpha = 0\right),
+        \end{equation*}
+        并且由于 $H$ 正定, 存在常数 $K > 0$ 使
+        \begin{equation*}
+            K^{-1}I \le H \le K I.
+        \end{equation*}
+
+        因此, 矩阵
+        \begin{equation*}
+            \boxed{
+                \widehat{H}\left(\omega\right) =
+                \begin{bmatrix}
+                    1 & -10\\
+                    -10 & 101
+                \end{bmatrix}
+            }
+        \end{equation*}
+        满足定理 4.5.7 的条件 (4.5.14) 和 (4.5.15),
+        且可取 $\alpha = 0$.
+
+    \section*{补充作业}
+        设系统经过傅里叶变换后为
+        \begin{equation*}
+            \partial_{t} \widehat{u}\left(\omega, t\right) = \widehat{P}\left(i\omega\right) \, \widehat{u}\left(\omega, t\right),
+        \end{equation*}
+
+        定义能量函数
+        \begin{equation*}
+            E\left(\omega, t\right) := \left\lVert \widehat{u}\left(\omega, t\right) \right\rVert_{\mathbb{C}^{m}}^{2} = \widehat{u}\left(\omega, t\right)^{\ast}\widehat{u}\left(\omega, t\right).
+        \end{equation*}
+        对时间求导, 有
+        \begin{equation*}
+            \frac{\mathrm{d}}{\mathrm{d}t}E\left(\omega,t\right) = \widehat{u}^{\ast}\widehat{P}\left(i\omega\right)\widehat{u} + \left(\widehat{P}\left(i\omega\right)\widehat{u}\right)^{\ast}\widehat{u} = \widehat{u}^{\ast}\left(\widehat{P}\left(i\omega\right)+\widehat{P}\left(i\omega\right)^{\ast}\right)\widehat{u}.
+        \end{equation*}
+        由假设条件,
+        \begin{equation*}
+            \frac{\mathrm{d}}{\mathrm{d}t}E\left(\omega, t\right) \le 2\alpha\,E\left(\omega, t\right).
+        \end{equation*}
+        由 Gronwall 不等式可得
+        \begin{equation*}
+            E\left(\omega, t\right) \le e^{2\alpha t}E\left(\omega, 0\right) = e^{2\alpha t}\left\lVert \widehat{u}_{0}\left(\omega\right) \right\rVert^{2}.
+        \end{equation*}
+
+        对 $\omega$ 积分, 并由 Parseval 等式,
+        \begin{equation*}
+            \left\lVert u\left(\cdot, t\right) \right\rVert_{L^{2}}^{2} = \int_{\mathbb{R}} E\left(\omega, t\right) \, \mathrm{d}\omega \le e^{2\alpha t}\int_{\mathbb{R}} \left\lVert \widehat{u}_{0}\left(\omega\right) \right\rVert^{2} \, \mathrm{d}\omega = e^{2\alpha t}\left\lVert u_{0} \right\rVert_{L^{2}}^{2}.
+        \end{equation*}
+        因此,
+        \begin{equation*}
+            \boxed{\left\lVert u\left(\cdot, t\right)\right\rVert_{L^{2}} \le e^{\alpha t}\left\lVert u_{0} \right\rVert_{L^{2}}.}
+        \end{equation*}
+
+        该不等式表明:
+        \begin{itemize}
+            \item 解随时间的增长至多呈指数形式;
+            \item 解对初值连续依赖;
+            \item 解唯一.
+        \end{itemize}
+
+        由于常系数线性系统的存在性可由傅里叶表示
+        \begin{equation*}
+            \widehat{u}\left(\omega, t\right) = e^{t\widehat{P}\left(i\omega\right)}\widehat{u}_{0}\left(\omega\right)
+        \end{equation*}
+        直接得到, 因此初值问题 (1) 是 \textbf{well-posed}.
+
+        事实上, 这正是定理 4.5.7 的特例, 取 $\widehat{H}\left(\omega\right) \equiv I$, $K=1$,
+        此时条件
+        \begin{equation*}
+            \widehat{H}\widehat{P}\left(i\omega\right) + \widehat{P}\left(i\omega\right)^{\ast}\widehat{H} \le 2\alpha \widehat{H}
+        \end{equation*}
+        即为题设所给的不等式.
+\end{document}
