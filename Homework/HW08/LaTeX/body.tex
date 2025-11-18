@@ -1,0 +1,585 @@
+\documentclass[12pt]{article}
+
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+
+\title{偏微分方程数值解作业}
+\author{PB22000150~~刘行}
+\date{\today}
+
+\begin{document}
+    \maketitle
+
+    \section*{3.1.2}
+        考虑偏微分方程
+        \begin{equation*}
+        v_t + a v_x = \nu v_{xx},
+        \end{equation*}
+        令
+        \begin{equation*}
+        R = \frac{a\,\Delta t}{\Delta x},\qquad
+        r = \frac{\nu\,\Delta t}{\Delta x^2},
+        \end{equation*}
+        并采用中心差分算子
+        \begin{equation*}
+        \delta_0 v_k^n = v_{k+1}^n - v_{k-1}^n,\qquad
+        \delta^2 v_k^n = v_{k+1}^n - 2v_k^n + v_{k-1}^n .
+        \end{equation*}
+
+        在 von~Neumann 意义下，令
+        \begin{equation*}
+        v_k^n = G^n e^{i k\theta},\qquad \theta = \frac{2\pi m}{M},
+        \end{equation*}
+        则
+        \begin{equation*}
+        \delta_0 v_k^n = 2i\sin\theta\, v_k^n,\qquad
+        \delta^2 v_k^n = -4\sin^2\!\left(\frac{\theta}{2}\right) v_k^n .
+        \end{equation*}
+
+        \subsection*{(1) 格式一的稳定性}
+            格式为
+            \begin{equation*}
+            v_k^{n+1} + \frac{R}{2}\delta_0 v_k^{n+1} - r\,\delta^2 v_k^{n+1} = v_k^n .
+            \end{equation*}
+            代入 $v_k^{n+1} = G v_k^n$，并使用上面的差分作用结果，得到
+            \begin{equation*}
+            \left[1 + \frac{R}{2}\cdot 2i\sin\theta - r\bigl(-4\sin^2(\tfrac{\theta}{2})\bigr)\right] G v_k^n
+            = v_k^n .
+            \end{equation*}
+            约去 $v_k^n\neq 0$，得
+            \begin{equation*}
+            \bigl(1 + i R\sin\theta + 4r\sin^2(\tfrac{\theta}{2})\bigr) G = 1,
+            \end{equation*}
+            即放大因子
+            \begin{equation*}
+            G(\theta) =
+            \frac{1}{1 + 4r\sin^2(\tfrac{\theta}{2}) + i R\sin\theta } .
+            \end{equation*}
+            于是
+            \begin{equation*}
+            |G(\theta)|^2
+            = \frac{1}{\bigl(1 + 4r\sin^2(\tfrac{\theta}{2})\bigr)^2 + R^2\sin^2\theta } .
+            \end{equation*}
+            注意到 $r\ge 0$，$\sin^2(\tfrac{\theta}{2})\ge 0$，故
+            \begin{equation*}
+            \bigl(1 + 4r\sin^2(\tfrac{\theta}{2})\bigr)^2 \ge 1,
+            \end{equation*}
+            再加上非负项 $R^2\sin^2\theta$ 得
+            \begin{equation*}
+            \bigl(1 + 4r\sin^2(\tfrac{\theta}{2})\bigr)^2 + R^2\sin^2\theta \ge 1.
+            \end{equation*}
+            因此
+            \begin{equation*}
+            |G(\theta)|^2 \le 1,\qquad \forall\,\theta,\ \forall\,r\ge 0,\ R\in\mathbb{R},
+            \end{equation*}
+            说明该格式无条件稳定。
+
+        \subsection*{(2) 格式二的稳定性}
+            格式为
+            \begin{equation*}
+            v_k^{n+1} + \frac{R}{4}\delta_0 v_k^{n+1}
+            - \frac{r}{2}\delta^2 v_k^{n+1}
+            = v_k^n - \frac{R}{4}\delta_0 v_k^n + \frac{r}{2}\delta^2 v_k^n .
+            \end{equation*}
+            同样代入
+            \begin{equation*}
+            v_k^{n+1} = G v_k^n,\qquad
+            \delta_0 v_k^n = 2i\sin\theta\, v_k^n,\qquad
+            \delta^2 v_k^n = -4\sin^2(\tfrac{\theta}{2})v_k^n,
+            \end{equation*}
+            得到左端为
+            \begin{equation*}
+            \left[1 + \frac{R}{4}\cdot 2i\sin\theta
+                - \frac{r}{2}\bigl(-4\sin^2(\tfrac{\theta}{2})\bigr)\right]G v_k^n
+            = \bigl(1 + i\frac{R}{2}\sin\theta + 2r\sin^2(\tfrac{\theta}{2})\bigr) G v_k^n ,
+            \end{equation*}
+            右端为
+            \begin{equation*}
+            \left[1 - \frac{R}{4}\cdot 2i\sin\theta
+                + \frac{r}{2}\bigl(-4\sin^2(\tfrac{\theta}{2})\bigr)\right] v_k^n
+            = \bigl(1 - i\frac{R}{2}\sin\theta - 2r\sin^2(\tfrac{\theta}{2})\bigr) v_k^n .
+            \end{equation*}
+            约去 $v_k^n$，得到
+            \begin{equation*}
+            \bigl(1 + i\frac{R}{2}\sin\theta + 2r\sin^2(\tfrac{\theta}{2})\bigr) G
+            = 1 - i\frac{R}{2}\sin\theta - 2r\sin^2(\tfrac{\theta}{2}).
+            \end{equation*}
+            记
+            \begin{equation*}
+            s = \sin\!\left(\frac{\theta}{2}\right),\qquad
+            B = \frac{R}{2}\sin\theta,\qquad
+            A = 2rs^2,
+            \end{equation*}
+            则
+            \begin{equation*}
+            G(\theta) =
+            \frac{1 - A - iB}{1 + A + iB}.
+            \end{equation*}
+            于是
+            \begin{equation*}
+            |G(\theta)|^2
+            = \frac{(1-A)^2 + B^2}{(1+A)^2 + B^2}.
+            \end{equation*}
+            因为 $A = 2rs^2\ge 0$，故
+            \begin{equation*}
+            (1-A)^2 \le (1+A)^2,
+            \end{equation*}
+            于是
+            \begin{equation*}
+            (1-A)^2 + B^2 \le (1+A)^2 + B^2,
+            \end{equation*}
+            从而
+            \begin{equation*}
+            |G(\theta)|^2 \le 1,\qquad \forall\,\theta,\ \forall\,r\ge 0,\ R\in\mathbb{R}.
+            \end{equation*}
+
+            因此，题目中的两个差分格式均为无条件稳定。
+
+    \section*{补 1}
+        考虑线性平流方程
+        \begin{equation*}
+        u_t + a u_x = 0 ,\qquad a \in \mathbb{R}.
+        \end{equation*}
+        Lax 格式写为
+        \begin{equation*}
+        v_j^{n+1} = \frac12 \bigl( v_{j+1}^n + v_{j-1}^n \bigr)
+                - \frac12 r \delta_0 v_j^n,
+        \end{equation*}
+        其中
+        \begin{equation*}
+        r = \frac{a\Delta t}{\Delta x},\qquad
+        \delta_0 v_j^n = v_{j+1}^n - v_{j-1}^n .
+        \end{equation*}
+
+        \subsection*{(1) 将格式写成凸组合形式}
+            把格式中的 $\delta_0 v_j^n$ 展开, 有
+            \begin{equation*}
+            v_j^{n+1}
+            = \frac12 (v_{j+1}^n + v_{j-1}^n)
+                - \frac12 r (v_{j+1}^n - v_{j-1}^n)
+            = \alpha v_{j+1}^n + \beta v_{j-1}^n ,
+            \end{equation*}
+            其中
+            \begin{equation*}
+            \alpha = \frac12 (1-r),\qquad
+            \beta  = \frac12 (1+r).
+            \end{equation*}
+            容易验证
+            \begin{equation*}
+            \alpha + \beta = 1 .
+            \end{equation*}
+            当
+            \begin{equation*}
+            |r| = \left|\frac{a\Delta t}{\Delta x}\right| \le 1
+            \end{equation*}
+            时, 有
+            \begin{equation*}
+            1-r \ge 0,\qquad 1+r \ge 0,
+            \end{equation*}
+            于是
+            \begin{equation*}
+            \alpha \ge 0,\qquad \beta \ge 0.
+            \end{equation*}
+            因此在 CFL 条件 $|r|\le 1$ 下,
+            \begin{equation*}
+            v_j^{n+1} = \alpha v_{j+1}^n + \beta v_{j-1}^n
+            \end{equation*}
+            是两个格点值的凸组合.
+
+        \subsection*{(2) 离散最大模原理与 $L_\infty$ 稳定性}
+            定义离散无穷范数
+            \begin{equation*}
+            \left\lVert v^n \right\rVert_\infty = \max_{j} |v_j^n|.
+            \end{equation*}
+            有
+            \begin{equation*}
+            |v_j^{n+1}| = |\alpha v_{j+1}^n + \beta v_{j-1}^n|
+            \le \alpha |v_{j+1}^n| + \beta |v_{j-1}^n|.
+            \end{equation*}
+            再利用 $\alpha,\beta\ge 0$ 以及
+            \begin{equation*}
+            |v_{j+1}^n| \le \left\lVert v^n \right\rVert_\infty ,\qquad
+            |v_{j-1}^n| \le \left\lVert v^n \right\rVert_\infty ,
+            \end{equation*}
+            得到
+            \begin{equation*}
+            |v_j^{n+1}|
+            \le (\alpha + \beta)\,\left\lVert v^n \right\rVert_\infty
+            = \left\lVert v^n \right\rVert_\infty .
+            \end{equation*}
+            对所有 $j$ 取最大值得
+            \begin{equation*}
+            \left\lVert v^{n+1}\right\rVert _\infty \le  \left\lVert v^n \right\rVert_\infty .
+            \end{equation*}
+            用数学归纳法可得, 对任意 $n\ge 0$,
+            \begin{equation*}
+            \left\lVert v^n\right\rVert _\infty \le  \left\lVert v^0 \right\rVert_\infty .
+            \end{equation*}
+            因此, 当 $|r|\le 1$ 时, Lax 格式关于 $L_\infty$ 范数是稳定的.
+
+    \section*{补 2}
+        考虑热方程
+        \begin{equation*}
+        u_t = u_{xx}.
+        \end{equation*}
+        其 FTCS 格式为
+        \begin{equation*}
+        v_j^{n+1}
+        = v_j^n + \mu (v_{j+1}^n - 2v_j^n + v_{j-1}^n),
+        \end{equation*}
+        其中
+        \begin{equation*}
+        \mu = \frac{\Delta t}{\Delta x^2}.
+        \end{equation*}
+        定义离散 $L_2$ 范数
+        \begin{equation*}
+        \left\lVert v^n \right\rVert_{2,\Delta x}^2
+        = \sum_j |v_j^n|^2\,\Delta x .
+        \end{equation*}
+
+        \subsection*{(1) Fourier 模分析}
+            设格点函数在无穷区间或周期区间上, 可写成 Fourier 模的线性组合. 只需对单一波数 $k$ 的模
+            \begin{equation*}
+            v_j^n = \hat{v}^n e^{i k x_j},\qquad x_j = j\Delta x
+            \end{equation*}
+            进行分析. 代入格式, 有
+            \begin{equation*}
+            \hat{v}^{n+1} e^{i k x_j}
+            = \hat{v}^n e^{i k x_j}
+            + \mu \hat{v}^n
+            \left( e^{i k x_{j+1}} -2 e^{i k x_j} + e^{i k x_{j-1}} \right).
+            \end{equation*}
+            两边约去 $e^{i k x_j}$, 得到放大因子 $G(k)$:
+            \begin{equation*}
+            \hat{v}^{n+1} = G(k)\,\hat{v}^n,
+            \qquad
+            G(k) = 1 + \mu\left( e^{i k\Delta x} -2 + e^{-i k\Delta x} \right).
+            \end{equation*}
+            利用
+            \begin{equation*}
+            e^{i\theta} + e^{-i\theta} = 2\cos\theta ,
+            \end{equation*}
+            有
+            \begin{equation*}
+            G(k)
+            = 1 + \mu \bigl( 2\cos(k\Delta x) - 2 \bigr)
+            = 1 + 2\mu\bigl( \cos(k\Delta x)-1 \bigr).
+            \end{equation*}
+            进一步利用
+            \begin{equation*}
+            \cos(k\Delta x)-1
+            = -2\sin^2\!\left(\frac{k\Delta x}{2}\right),
+            \end{equation*}
+            得到
+            \begin{equation*}
+            G(k)
+            = 1 - 4\mu \sin^2\!\left(\frac{k\Delta x}{2}\right).
+            \end{equation*}
+            可见 $G(k)$ 为实数, 且满足
+            \begin{equation*}
+            G(k)\le 1.
+            \end{equation*}
+            要保证稳定性, 需要对所有波数 $k$ 有
+            \begin{equation*}
+            |G(k)| \le 1.
+            \end{equation*}
+            因为
+            \begin{equation*}
+            0 \le \sin^2\!\left(\frac{k\Delta x}{2}\right) \le 1,
+            \end{equation*}
+            所以
+            \begin{equation*}
+            G_{\min} = 1 - 4\mu .
+            \end{equation*}
+            因此
+            \begin{equation*}
+            |G(k)|\le1 \Longleftrightarrow
+            -1 \le 1 - 4\mu \le 1,
+            \end{equation*}
+            化简得到
+            \begin{equation*}
+            0 \le \mu \le \frac12.
+            \end{equation*}
+
+        \subsection*{(2) $L_{2,\Delta x}$ 范数的稳定性}
+            若 $0\le\mu\le \tfrac12$, 则对任意波数 $k$ 有 $|G(k)|\le1$.
+            离散 Fourier 变换是一个保持 $L_2$ 范数的正交变换, 因此
+            \begin{equation*}
+            \left\lVert v^{n+1} \right\rVert_{2,\Delta x}^2
+            = \sum_k |\hat{v}^{n+1}(k)|^2
+            = \sum_k |G(k)\hat{v}^n(k)|^2
+            \le \sum_k |\hat{v}^n(k)|^2
+            = \left\lVert v^n \right\rVert_{2,\Delta x}^2.
+            \end{equation*}
+            于是对任意 $n$,
+            \begin{equation*}
+            \left\lVert v^n\right\rVert _{2,\Delta x} \le  \left\lVert v^0 \right\rVert_{2,\Delta x},
+            \end{equation*}
+            即在条件
+            \begin{equation*}
+            0\le\mu=\frac{\Delta t}{\Delta x^2} \le \frac12
+            \end{equation*}
+            下, 热方程的 FTCS 格式关于 $L_{2,\Delta x}$ 是稳定的.
+
+    \section*{补3}
+        考虑线性常系数方程
+        \begin{equation*}
+        u_t + u_x - \nu_2 u_{xx} + \mu_3 u_{xxx} = 0,
+        \qquad \nu_2,\mu_3 \text{ 为常数}.
+        \end{equation*}
+
+        \subsection*{(1) Fourier 模分析}
+            令
+            \begin{equation*}
+            u(x,t) = \exp\bigl( i(kx-\omega t)\bigr),
+            \end{equation*}
+            其中 $k$ 为波数, $\omega$ 为频率. 则
+            \begin{equation*}
+            u_t = -i\omega u,\quad
+            u_x = ik u,\quad
+            u_{xx} = (ik)^2 u = -k^2 u,\quad
+            u_{xxx} = (ik)^3 u = -ik^3 u .
+            \end{equation*}
+            代回 PDE:
+            \begin{equation*}
+            (-i\omega)u + (ik)u - \nu_2(-k^2u) + \mu_3(-ik^3u)=0.
+            \end{equation*}
+            约去 $u\neq0$ 得
+            \begin{equation*}
+            -i\omega + ik + \nu_2 k^2 - i\mu_3 k^3 = 0.
+            \end{equation*}
+            把上述式子写成
+            \begin{equation*}
+            -i\omega = -ik - \nu_2 k^2 + i\mu_3 k^3 ,
+            \end{equation*}
+            两边乘以 $i$, 得到色散关系
+            \begin{equation*}
+            \omega = k - \mu_3 k^3 + i(-\nu_2 k^2).
+            \end{equation*}
+            记
+            \begin{equation*}
+            \omega = \omega_R + i\omega_I,
+            \end{equation*}
+            则
+            \begin{equation*}
+            \omega_R = k - \mu_3 k^3,\qquad
+            \omega_I = -\nu_2 k^2.
+            \end{equation*}
+
+        \subsection*{(2) 耗散性分析}
+            解的一般形式为
+            \begin{equation*}
+            u(x,t) = \exp\bigl(-i\omega t\bigr)\exp(ikx)
+                = \exp\bigl(-i\omega_R t\bigr)
+                    \exp\bigl(\omega_I t\bigr)\exp(ikx).
+            \end{equation*}
+            其中振幅因子为 $\exp(\omega_I t)$. 若对所有 $k$ 有 $\omega_I\le0$,
+            则振幅随时间衰减, 方程是耗散的.
+
+            这里
+            \begin{equation*}
+            \omega_I = -\nu_2 k^2 \le 0 \quad (\nu_2 \ge 0),
+            \end{equation*}
+            且当 $k\neq0$ 时严格小于 0. 因此当 $\nu_2>0$ 时, 该方程对非零波数表现为指数衰减, 是耗散的.
+
+        \subsection*{(3) 色散性分析}
+            相速度为
+            \begin{equation*}
+            c_p(k) = \frac{\omega_R}{k}
+                = 1 - \mu_3 k^2.
+            \end{equation*}
+            可见 $c_p$ 随波数 $k$ 变化, 只要 $\mu_3\neq0$, 不同波数的信号传播速度不同, 这就是典型的色散现象. 因此:
+            \begin{itemize}
+            \item $\nu_2 > 0$ 决定耗散;
+            \item $\mu_3 \neq 0$ 决定色散.
+            \end{itemize}
+
+    \section*{补 4}
+        \subsection*{(1) PDE $u_t = u_{xx}$ 的耗散性与色散性}
+            将方程写成
+            \begin{equation*}
+            u_t - u_{xx} = 0.
+            \end{equation*}
+            同样取 Fourier 模
+            \begin{equation*}
+            u(x,t) = \exp\bigl(i(kx-\omega t)\bigr),
+            \end{equation*}
+            则
+            \begin{equation*}
+            u_t = -i\omega u,\qquad
+            u_{xx} = -k^2 u.
+            \end{equation*}
+            代入 PDE:
+            \begin{equation*}
+            -i\omega u - (-k^2 u) = 0
+            \quad\Longrightarrow\quad
+            -i\omega + k^2 = 0.
+            \end{equation*}
+            于是
+            \begin{equation*}
+            \omega = -i k^2.
+            \end{equation*}
+            故
+            \begin{equation*}
+            \omega_R = 0,\qquad
+            \omega_I = -k^2 \le 0.
+            \end{equation*}
+            振幅因子为
+            \begin{equation*}
+            \exp(\omega_I t) = \exp(-k^2 t),
+            \end{equation*}
+            对所有 $k\neq0$ 均随时间指数衰减, 说明热方程是强耗散的.
+
+            另一方面, 相速度
+            \begin{equation*}
+            c_p = \frac{\omega_R}{k} = 0,
+            \end{equation*}
+            与波数无关, 且没有传播, 只是纯衰减, 因此该 PDE 不具有色散性 (无相速度的波数依赖性).
+
+        \subsection*{(2) FTCS 格式的耗散性与色散性 (方法一: 模分析)}
+            FTCS 格式表达式仍为
+            \begin{equation*}
+            v_j^{n+1}
+            = v_j^n + \mu (v_{j+1}^n - 2v_j^n + v_{j-1}^n),
+            \qquad
+            \mu = \frac{\Delta t}{\Delta x^2}.
+            \end{equation*}
+            对 Fourier 模
+            \begin{equation*}
+            v_j^n = \hat{v}^n e^{ikx_j}
+            \end{equation*}
+            进行分析, 之前已得到放大因子
+            \begin{equation*}
+            G(k) = 1 - 4\mu \sin^2\!\left(\frac{k\Delta x}{2}\right).
+            \end{equation*}
+            记
+            \begin{equation*}
+            G(k) = |G(k)| e^{-i\theta(k)},
+            \end{equation*}
+            则数值解在一步时间上的变化为
+            \begin{equation*}
+            \hat{v}^{n+1} = G(k)\,\hat{v}^n
+            = |G(k)| e^{-i\theta(k)} \hat{v}^n .
+            \end{equation*}
+            其中
+            \begin{equation*}
+            |G(k)| = \bigl|1-4\mu\sin^2(\tfrac{k\Delta x}{2})\bigr|
+            \end{equation*}
+            控制振幅变化, $\theta(k)$ 控制相位变化.
+
+            \paragraph{耗散性} 当 $0<\mu<\tfrac12$ 时, 对非零波数有
+            \begin{equation*}
+            0 < 1 - 4\mu \le G(k) < 1,
+            \end{equation*}
+            特别地, 当 $k\neq0$ 且 $\sin^2(\tfrac{k\Delta x}{2})>0$ 时, 有
+            \begin{equation*}
+            0 < G(k) < 1,
+            \end{equation*}
+            故
+            \begin{equation*}
+            |G(k)|<1.
+            \end{equation*}
+            这意味着每一步中所有非零波数的振幅都被衰减, 表现出数值耗散性, 而且高频 ($\sin^2$ 较大) 衰减更快.
+
+            \paragraph{色散性} 由于 $G(k)$ 为实数且非负, 所以
+            \begin{equation*}
+            \theta(k) = 0,
+            \end{equation*}
+            一步时间更新中没有额外的相位改动, 因此从严格意义上讲, 这个 FTCS 格式对热方程并不引入数值色散 (相速度始终为 0), 只表现为纯耗散.
+
+        \subsection*{(3) FTCS 格式的耗散性与色散性 (方法二: 修正方程)}
+            另一种分析方法是通过求修正方程 (又称等效方程). 将数值格式展开到一定阶数, 寻找一个连续 PDE, 使其解在截断误差范围内逼近数值解.
+
+            对格式
+            \begin{equation*}
+            v_j^{n+1}
+            = v_j^n + \mu (v_{j+1}^n - 2v_j^n + v_{j-1}^n)
+            \end{equation*}
+            假设 $v_j^n$ 近似于某个光滑函数 $u(x,t)$ 在 $(x_j,t_n)$ 处的值:
+            \begin{equation*}
+            v_j^n \approx u(x_j,t_n).
+            \end{equation*}
+            对时间方向作 Taylor 展开:
+            \begin{equation*}
+            u(x_j,t_{n+1})
+            = u(x_j,t_n) + \Delta t\,u_t
+            + \frac{\Delta t^2}{2} u_{tt}
+            + O(\Delta t^3).
+            \end{equation*}
+            空间方向同理:
+            \begin{equation*}
+            u(x_{j\pm1},t_n)
+            = u(x_j,t_n) \pm \Delta x\,u_x
+            + \frac{\Delta x^2}{2} u_{xx}
+            \pm \frac{\Delta x^3}{6} u_{xxx}
+            + \frac{\Delta x^4}{24} u_{xxxx}
+            + O(\Delta x^5).
+            \end{equation*}
+            代入格式
+            \begin{equation*}
+            u(x_j,t_{n+1})
+            = u(x_j,t_n) + \mu
+            \bigl( u(x_{j+1},t_n) -2u(x_j,t_n) + u(x_{j-1},t_n) \bigr),
+            \end{equation*}
+            左边用时间展开, 右边用空间展开, 得到
+            \begin{equation*}
+            u + \Delta t\,u_t + \frac{\Delta t^2}{2} u_{tt} + O(\Delta t^3)
+            = u + \mu\bigl( \Delta x^2 u_{xx} + \frac{\Delta x^4}{12}u_{xxxx} + O(\Delta x^5) \bigr).
+            \end{equation*}
+            约去 $u$, 得到
+            \begin{equation*}
+            \Delta t\,u_t + \frac{\Delta t^2}{2} u_{tt}
+            = \mu\Delta x^2 u_{xx} + \mu\frac{\Delta x^4}{12} u_{xxxx}
+            + O(\Delta t^3,\Delta x^5).
+            \end{equation*}
+            记 $\mu = \dfrac{\Delta t}{\Delta x^2}$, 化简得
+            \begin{equation*}
+            u_t + \frac{\Delta t}{2} u_{tt}
+            = u_{xx} + \frac{\Delta x^2}{12} u_{xxxx}
+            + O(\Delta t^2,\Delta x^4).
+            \end{equation*}
+            现用原 PDE $u_t = u_{xx}$ 代入 $u_{tt}$ 的主阶:
+            \begin{equation*}
+            u_{tt} = (u_{xx})_t \approx (u_t)_{xx} = (u_{xx})_{xx} = u_{xxxx}.
+            \end{equation*}
+            于是修正方程近似为
+            \begin{equation*}
+            u_t = u_{xx}
+            + \left(\frac{\Delta x^2}{12}-\frac{\Delta t}{2}\right) u_{xxxx}
+            + \cdots .
+            \end{equation*}
+
+            \paragraph{从修正方程看耗散性与色散性}
+
+            对 Fourier 模 $u = e^{i(kx-\omega t)}$,
+            \begin{equation*}
+            u_{xx} = -k^2 u,\qquad
+            u_{xxxx} = k^4 u.
+            \end{equation*}
+            代入修正方程主阶:
+            \begin{equation*}
+            -i\omega u
+            = -k^2 u
+            + \left(\frac{\Delta x^2}{12}-\frac{\Delta t}{2}\right) k^4 u.
+            \end{equation*}
+            约去 $u$,
+            \begin{equation*}
+            -i\omega
+            = -k^2 + \left(\frac{\Delta x^2}{12}-\frac{\Delta t}{2}\right)k^4.
+            \end{equation*}
+            从中可以看出:
+            \begin{itemize}
+            \item 右侧全为实数, 因此 $\omega$ 为纯虚数, 说明修正方程仍然没有相位项, 不产生色散；
+            \item 若
+                \begin{equation*}
+                \frac{\Delta x^2}{12}-\frac{\Delta t}{2}<0
+                \quad\Longleftrightarrow\quad
+                \Delta t > \frac{\Delta x^2}{6},
+                \end{equation*}
+                则高阶项的符号与主耗散项相同 (都是 $-k^2$ 型), 增强了高频耗散；
+            \item 反之若 $\Delta t$ 很小, 则高阶项可能减弱部分波数的耗散, 但在稳定条件 $\mu\le\tfrac12$ 下, 总体仍表现为耗散.
+            \end{itemize}
+            从修正方程角度再次验证: FTCS 格式主要引入的是高阶耗散项而非色散项, 与模分析的结论一致.
+\end{document}
