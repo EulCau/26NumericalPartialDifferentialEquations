@@ -1,0 +1,214 @@
+\documentclass[12pt]{article}
+\usepackage{ctex}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\title{偏微分方程数值解作业09}
+\author{PB22000150~刘行}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{HW 5.8.4}
+
+题目给出的差分格式为
+\begin{equation*}
+u^{n+1}_{j,k}
+= u^n_{j,k}
+- \frac{R_x}{2}\delta_x^0 u^n_{j,k}
++ \frac{R_x^2}{2}\delta_x^2 u^n_{j,k}
+- \frac{R_y}{2}\delta_y^0 u^n_{j,k}
++ \frac{R_y^2}{2}\delta_y^2 u^n_{j,k}.
+\end{equation*}
+其中
+\begin{equation*}
+\delta_x^0 u^n_{j,k} = u^n_{j+1,k} - u^n_{j-1,k}, \qquad
+\delta_x^2 u^n_{j,k} = u^n_{j+1,k} - 2u^n_{j,k} + u^n_{j-1,k},
+\end{equation*}
+$y$ 方向定义完全类似。
+
+该格式试图逼近二维线性平流方程
+\begin{equation*}
+u_t + a u_x + b u_y = 0,
+\qquad
+R_x = \frac{a\Delta t}{\Delta x},\;
+R_y = \frac{b\Delta t}{\Delta y}.
+\end{equation*}
+
+我们对格式左侧做 Taylor 展开：
+\begin{align*}
+u^{n+1}_{j,k}
+&= u(x_j,y_k,t_n+\Delta t) \\
+&= u + \Delta t u_t + \frac{\Delta t^2}{2}u_{tt}
++ \frac{\Delta t^3}{6}u_{ttt} + O(\Delta t^4).
+\end{align*}
+
+再展开右侧每个差分算子。以 $x$ 方向为例，
+\begin{align*}
+\delta_x^0 u^n_{j,k}
+&= u(x+\Delta x) - u(x-\Delta x) \\
+&= 2\Delta x u_x + \frac{2\Delta x^3}{3}u_{xxx} + O(\Delta x^5),
+\\
+\delta_x^2 u^n_{j,k}
+&= u(x+\Delta x) - 2u(x) + u(x-\Delta x)
+= \Delta x^2 u_{xx} + \frac{\Delta x^4}{12}u_{xxxx} + O(\Delta x^6).
+\end{align*}
+
+代入格式右端得：
+\begin{align*}
+u^n_{j,k}
+&- R_x\Delta x\, u_x - \frac{R_x\Delta x^3}{3}u_{xxx}
++ \frac{R_x^2}{2}\Delta x^2 u_{xx}
+- R_y\Delta y \,u_y - \frac{R_y\Delta y^3}{3}u_{yyy}
++ \frac{R_y^2}{2}\Delta y^2 u_{yy}
++ O(\Delta x^4 + \Delta y^4).
+\end{align*}
+
+由于 $R_x=a\Delta t/\Delta x$，化简得
+\begin{align*}
+u^n_{j,k}
+&- a\Delta t u_x - \frac{a\Delta t\,\Delta x^2}{3}u_{xxx}
++ \frac{a^2\Delta t^2}{2} u_{xx}
+- b\Delta t u_y - \frac{b\Delta t\,\Delta y^2}{3}u_{yyy}
++ \frac{b^2\Delta t^2}{2} u_{yy}.
+\end{align*}
+
+现在比较两边 Taylor 展开。左侧二阶项为
+\begin{equation*}
+\frac{\Delta t^2}{2}u_{tt}.
+\end{equation*}
+
+而 PDE 给出
+\begin{equation*}
+u_{tt} = (a u_x + b u_y)_t = a u_{xt} + b u_{yt}
+= a^2 u_{xx} + 2 ab u_{xy} + b^2 u_{yy}.
+\end{equation*}
+
+于是左侧二阶项应为
+\begin{equation*}
+\frac{\Delta t^2}{2}
+(a^2 u_{xx} + 2 a b u_{xy} + b^2 u_{yy}).
+\end{equation*}
+
+而右侧二阶项为
+\begin{equation*}
+\frac{a^2\Delta t^2}{2}u_{xx}
++ \frac{b^2\Delta t^2}{2}u_{yy},
+\end{equation*}
+缺失关键项
+\begin{equation*}
+a b \Delta t^2 u_{xy}.
+\end{equation*}
+
+因此二阶项不匹配，从而局部截断误差包含一阶项：
+\begin{equation*}
+\tau = O(\Delta t),
+\end{equation*}
+故该格式 \textbf{在时间上不是二阶精度}。
+
+\section*{HW 5.8.7}
+
+我们希望确定点 $(j\Delta x,k\Delta y,(n+1)\Delta t)$ 的数值解依赖哪些网格点。
+
+\subsection*{(1) 格式一}
+\begin{equation*}
+u^{n+1}_{j,k}
+= a_2 u^n_{j,k-1} + a_3 u^n_{j,k} + a_4 u^n_{j,k+1}.
+\end{equation*}
+
+显然，它仅用到上一层 $n$ 层的 $(j,k-1)$、$(j,k)$、$(j,k+1)$。
+
+继续向前递推可得依赖域为所有满足
+\begin{equation*}
+k-(n-m) \le k' \le k+(n-m)
+\end{equation*}
+的点 $(j,k')$，其中 $m$ 为层数。
+
+因此数值依赖域为以 $(j,k)$ 为中心、$k$ 方向逐层扩大的条带区域（横向三点格式形成 1D 锥形域）。
+
+\subsection*{(2) 格式二}
+\begin{equation*}
+u^{n+1}_{j,k}
+= a_1 u^n_{j-1,k} + a_3 u^n_{j,k} + a_4 u^n_{j+1,k} + a_5 u^n_{j,k+1}.
+\end{equation*}
+
+该格式依赖四个点：
+\begin{equation*}
+(j-1,k),\quad (j,k),\quad (j+1,k),\quad (j,k+1).
+\end{equation*}
+
+逐层回溯可知依赖域呈 ``L'' 形扩展，既包含 $x$ 方向的扩散，也包含 $y$ 方向的偏移。
+
+\section*{补充题}
+
+考虑热方程
+\begin{equation*}
+u_t = \alpha u_{xx}.
+\end{equation*}
+
+Crank--Nicolson 格式写为
+\begin{equation*}
+\frac{u^{n+1}_j - u^n_j}{\Delta t}
+= \alpha \frac{u^{n+1}_{j+1}-2u^{n+1}_j+u^{n+1}_{j-1}}{2\Delta x^2}
++ \alpha \frac{u^n_{j+1}-2u^n_j+u^n_{j-1}}{2\Delta x^2}.
+\end{equation*}
+
+\subsection*{1. 截断误差}
+
+对 $u^{n+1}_j$ 做 Taylor 展开：
+\begin{equation*}
+u^{n+1}_j
+= u + \Delta t u_t + \frac{\Delta t^2}{2}u_{tt}
++ O(\Delta t^3),
+\end{equation*}
+空间二阶差分展开为
+\begin{equation*}
+\frac{u_{j+1}-2u_j+u_{j-1}}{\Delta x^2}
+= u_{xx} + \frac{\Delta x^2}{12}u_{xxxx} + O(\Delta x^4).
+\end{equation*}
+
+代入后可得局部截断误差
+\begin{equation*}
+\tau = O(\Delta t^2 + \Delta x^2).
+\end{equation*}
+
+因此 CN 格式 \textbf{时间二阶、空间二阶}。
+
+\subsection*{2. 相容性}
+
+将 PDE $u_t = \alpha u_{xx}$ 代入差分格式，可发现主项完全相消，仅余高阶项，因此该格式相容于热方程。
+
+由于截断误差 $\tau \to 0$ 当 $(\Delta t, \Delta x)\to 0$，故满足相容性定义。
+
+\subsection*{3. 稳定性（Fourier 模分析）}
+
+令
+\begin{equation*}
+u^n_j = \hat{u}^n e^{i k j\Delta x}.
+\end{equation*}
+代入可得放大因子
+\begin{equation*}
+G = \frac{1 - r\sin^2(k\Delta x/2)}{1 + r\sin^2(k\Delta x/2)},
+\qquad r = \alpha\frac{\Delta t}{\Delta x^2}.
+\end{equation*}
+
+显然有
+\begin{equation*}
+|G|\le 1.
+\end{equation*}
+
+因此 CN 格式为 **无条件稳定**。
+
+\bigskip
+
+综上，Crank--Nicolson 格式具有：
+\begin{itemize}
+  \item 二阶时间精度；
+  \item 二阶空间精度；
+  \item 无条件稳定；
+  \item 与热方程相容。
+\end{itemize}
+
+\end{document}
