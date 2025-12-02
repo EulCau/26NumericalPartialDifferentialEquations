@@ -1,0 +1,511 @@
+\documentclass[12pt]{article}
+\usepackage{ctex}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+\title{NPDE 作业 10}
+\author{刘行\quad PB22000150}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{题目1 \;（HW 4.4.11）}
+
+证明三维 Peaceman--Rachford 格式
+\begin{equation*}
+\left(1-\frac{r_x}{3}\delta_x^2\right)u_{jkl}^{\,n+\frac13}
+=
+\left(1+\frac{r_y}{3}\delta_y^2+\frac{r_z}{3}\delta_z^2\right)u_{jkl}^{\,n},
+\end{equation*}
+\begin{equation*}
+\left(1-\frac{r_y}{3}\delta_y^2\right)u_{jkl}^{\,n+\frac23}
+=
+\left(1+\frac{r_x}{3}\delta_x^2+\frac{r_z}{3}\delta_z^2\right)u_{jkl}^{\,n+\frac13},
+\end{equation*}
+\begin{equation*}
+\left(1-\frac{r_z}{3}\delta_z^2\right)u_{jkl}^{\,n+1}
+=
+\left(1+\frac{r_x}{3}\delta_x^2+\frac{r_y}{3}\delta_y^2\right)u_{jkl}^{\,n+\frac23},
+\end{equation*}
+对三维热方程
+\[
+u_t=a(u_{xx}+u_{yy}+u_{zz})
+\]
+是条件稳定的，并且截断误差阶为
+\[
+O(\Delta t)+O(\Delta x^2)+O(\Delta y^2)+O(\Delta z^2).
+\]
+
+\subsection*{(1) 截断误差与相容性}
+
+记空间步长分别为 $\Delta x,\Delta y,\Delta z$，时间步长为 $\Delta t$，
+\[
+r_x=\frac{a\Delta t}{\Delta x^2},\quad
+r_y=\frac{a\Delta t}{\Delta y^2},\quad
+r_z=\frac{a\Delta t}{\Delta z^2},
+\]
+三点中心差分算子
+\[
+\delta_x^2 u_{jkl}^n=\frac{u_{j+1,kl}^n-2u_{jkl}^n+u_{j-1,kl}^n}{\Delta x^2},
+\]
+$\delta_y^2,\delta_z^2$ 类似。
+
+把恰解 $u(x,y,z,t)$ 代入第一步格式，在网格点
+$(x_j,y_k,z_l,t_n)$ 处展开 Taylor 公式：
+\begin{equation*}
+u^{n+\frac13}_{jkl}
+=
+u_{jkl}(t_n+\tfrac13\Delta t)
+=
+u_{jkl}^n+\tfrac13\Delta t\,u_t
++O(\Delta t^2),
+\end{equation*}
+\begin{equation*}
+\delta_x^2 u^{n+\frac13}_{jkl}
+=
+u_{xx}(t_n+\tfrac13\Delta t)+O(\Delta x^2),
+\,
+\delta_y^2 u^{n}_{jkl}
+=
+u_{yy}(t_n)+O(\Delta y^2),
+\,
+\delta_z^2 u^{n}_{jkl}
+=
+u_{zz}(t_n)+O(\Delta z^2).
+\end{equation*}
+代入第一式左、右两边：
+\begin{align*}
+\text{LHS}
+&=\left(1-\frac{r_x}{3}\delta_x^2\right)u^{n+\frac13}_{jkl}  \\
+&=
+u_{jkl}^n+\tfrac13\Delta t\,u_t
+- \frac{a\Delta t}{3}\,u_{xx}
++O(\Delta t^2)+O(\Delta x^2),
+\\[0.3em]
+\text{RHS}
+&=\left(1+\frac{r_y}{3}\delta_y^2+\frac{r_z}{3}\delta_z^2\right)u_{jkl}^{n}  \\
+&=
+u_{jkl}^n
++\frac{a\Delta t}{3}(u_{yy}+u_{zz})
++O(\Delta y^2)+O(\Delta z^2).
+\end{align*}
+利用 PDE 本身
+\[
+u_t=a(u_{xx}+u_{yy}+u_{zz}),
+\]
+在 $t_n$ 处有
+\[
+\tfrac13\Delta t\,u_t
+-\frac{a\Delta t}{3}u_{xx}
+-\frac{a\Delta t}{3}(u_{yy}+u_{zz})=0.
+\]
+于是第一步方程的局部截断误差为
+\[
+\tau^{(1)}_{jkl}=O(\Delta t^2)+O(\Delta x^2)+O(\Delta y^2)+O(\Delta z^2).
+\]
+第二、三步完全类似，只是时间层分别为 $t_n+\tfrac13\Delta t$ 与
+$t_n+\tfrac23\Delta t$，对这两个时刻同样有 PDE 成立，因此三步的局部截断误差均为
+\[
+O(\Delta t^2)+O(\Delta x^2)+O(\Delta y^2)+O(\Delta z^2).
+\]
+
+由分步格式组合得到整体格式的一步时间推进，
+其主导误差项仍为 $O(\Delta t)$，空间为二阶。
+因此该三维 Peaceman--Rachford 格式是
+\[
+\text{一阶时间、二阶空间的相容格式： }
+O(\Delta t)+O(\Delta x^2)+O(\Delta y^2)+O(\Delta z^2).
+\]
+
+\subsection*{(2) von~Neumann 稳定性分析}
+
+做冻结系数与 Fourier 模分析。对每个空间方向取周期边界，
+令
+\[
+u_{jkl}^n = g^n 
+\exp\big(i(j\theta_x+k\theta_y+l\theta_z)\big),
+\]
+记
+\[
+\lambda_x=-4\sin^2\frac{\theta_x}{2},\quad
+\lambda_y=-4\sin^2\frac{\theta_y}{2},\quad
+\lambda_z=-4\sin^2\frac{\theta_z}{2},
+\]
+则
+\[
+\delta_x^2 u_{jkl}^n=\lambda_x u_{jkl}^n,\quad
+\delta_y^2 u_{jkl}^n=\lambda_y u_{jkl}^n,\quad
+\delta_z^2 u_{jkl}^n=\lambda_z u_{jkl}^n,
+\]
+其中 $\lambda_x,\lambda_y,\lambda_z\le0$。
+
+记
+\[
+a_x=\frac{r_x}{3}\lambda_x\le0,\quad
+a_y=\frac{r_y}{3}\lambda_y\le0,\quad
+a_z=\frac{r_z}{3}\lambda_z\le0.
+\]
+三步格式在该 Fourier 模上的标量形式为
+\begin{align*}
+(1-a_x)u^{n+\frac13} &= (1+a_y+a_z)u^n,\\
+(1-a_y)u^{n+\frac23} &= (1+a_x+a_z)u^{n+\frac13},\\
+(1-a_z)u^{n+1}      &= (1+a_x+a_y)u^{n+\frac23}.
+\end{align*}
+消去中间层，得到增益因子
+\begin{equation*}
+G:=\frac{u^{n+1}}{u^n}
+=
+\frac{(1+a_y+a_z)(1+a_x+a_z)(1+a_x+a_y)}
+     {(1-a_x)(1-a_y)(1-a_z)}.
+\end{equation*}
+注意 $a_x,a_y,a_z\le0$，于是分母各因子均大于等于 $1$，
+分子中每个因子形如 $1+$（非正数）。
+当 $\Delta t\to0$ 时，$r_x,r_y,r_z\to0$，
+从而 $a_x,a_y,a_z\to0$，展开得
+\begin{equation*}
+G
+=1+O(r_x^2+r_y^2+r_z^2).
+\end{equation*}
+因此在 $\Delta t$ 足够小时，
+$|G|\le1$，并且 $G$ 关于 $(r_x,r_y,r_z)$ 是连续函数，
+故存在常数 $C>0$，当
+\[
+r_x+r_y+r_z\le C
+\quad
+\Big(\text{即 }\Delta t\le C_0(\Delta x^2+\Delta y^2+\Delta z^2)\Big)
+\]
+时，对所有 Fourier 模都有 $|G|\le1$。
+因此该格式在满足适当 CFL 条件（$\Delta t$ 充分小）时稳定，
+即为 \textbf{条件稳定}。
+
+\bigskip
+
+\section*{题目2 \;（HW 2.4.1）}
+
+证明当 $|R|\le1$ 时，差分格式
+\begin{equation*}
+u_k^{n+1}
+=\frac12\big(u_{k+1}^n+u_{k-1}^n\big)
+-\frac{R}{2}\,\delta_0 u_k^n
+\end{equation*}
+关于 $\|\cdot\|_\infty$ 范是稳定的。这里
+\[
+\delta_0 u_k^n = u_{k+1}^n-u_{k-1}^n.
+\]
+
+\subsection*{证明}
+
+先把格式写成显式凸组合形式。
+\begin{align*}
+u_k^{n+1}
+&=\frac12(u_{k+1}^n+u_{k-1}^n)
+-\frac{R}{2}(u_{k+1}^n-u_{k-1}^n) \\
+&=\left(\frac12-\frac{R}{2}\right)u_{k+1}^n
+ +\left(\frac12+\frac{R}{2}\right)u_{k-1}^n.
+\end{align*}
+记
+\[
+\alpha=\frac{1-R}{2},\qquad
+\beta =\frac{1+R}{2},
+\]
+则
+\[
+u_k^{n+1}=\alpha\,u_{k+1}^n+\beta\,u_{k-1}^n.
+\]
+
+当 $|R|\le1$ 时，有
+\[
+\alpha\ge0,\quad \beta\ge0,\quad \alpha+\beta=1.
+\]
+因此
+\begin{align*}
+|u_k^{n+1}|
+&=|\alpha\,u_{k+1}^n+\beta\,u_{k-1}^n|
+\le \alpha|u_{k+1}^n|+\beta|u_{k-1}^n|
+\le (\alpha+\beta)\max_j|u_j^n|\\
+&=\max_j|u_j^n|.
+\end{align*}
+对所有 $k$ 取最大值得
+\[
+\|u^{n+1}\|_\infty
+\le \|u^n\|_\infty.
+\]
+从而
+\[
+\|u^{n}\|_\infty \le \|u^0\|_\infty,\qquad n=1,2,\dots
+\]
+该格式在 $|R|\le1$ 时关于 sup 范是非增的，因此是稳定的。
+
+\bigskip
+
+\section*{题目3 \;（补充题 1）}
+
+\textbf{构造 $u_t+u_x+u_y=0$ 的 ADI 格式，并分析其精度与稳定性。}
+
+考虑二维平流方程
+\[
+u_t+u_x+u_y=0,
+\]
+假设平流速度为常数 $1$，取网格
+\[
+x_j=j\Delta x,\quad y_k=k\Delta y,\quad t_n=n\Delta t.
+\]
+为保证稳定性，在空间上采用迎风差分，
+因为速度为正，所以
+\[
+D_x^-u_{j,k}^n
+=\frac{u_{j,k}^n-u_{j-1,k}^n}{\Delta x},\qquad
+D_y^-u_{j,k}^n
+=\frac{u_{j,k}^n-u_{j,k-1}^n}{\Delta y}.
+\]
+
+\subsection*{(1) ADI 分裂格式}
+
+采用分两步的 ADI 思想：
+\begin{itemize}
+  \item 第一步：在 $x$ 方向隐式、$y$ 方向显式，
+  \begin{equation*}
+  \frac{u_{j,k}^{\,n+\frac12}-u_{j,k}^{\,n}}{\Delta t/2}
+  + D_x^-u_{j,k}^{\,n+\frac12}
+  + D_y^-u_{j,k}^{\,n}=0.
+  \end{equation*}
+  \item 第二步：在 $y$ 方向隐式、$x$ 方向显式，
+  \begin{equation*}
+  \frac{u_{j,k}^{\,n+1}-u_{j,k}^{\,n+\frac12}}{\Delta t/2}
+  + D_x^-u_{j,k}^{\,n+\frac12}
+  + D_y^-u_{j,k}^{\,n+1}=0.
+  \end{equation*}
+\end{itemize}
+这是一个典型的超抛物方程 ADI 迎风格式。
+由两步组合可知，该格式时间离散为一阶精度，
+空间上 $D_x^-,D_y^-$ 为一阶迎风差分，
+因此总体精度为
+\[
+O(\Delta t)+O(\Delta x)+O(\Delta y).
+\]
+
+\subsection*{(2) von~Neumann 稳定性分析}
+
+同样做 Fourier 模分析。
+令
+\[
+u_{j,k}^n = G^n
+\exp\big(i(j\theta_x+k\theta_y)\big),
+\]
+则
+\[
+D_x^- u_{j,k}^n = a_x u_{j,k}^n,\qquad
+D_y^- u_{j,k}^n = a_y u_{j,k}^n,
+\]
+其中
+\begin{align*}
+a_x &= \frac{1-e^{-i\theta_x}}{\Delta x},
+\\
+a_y &= \frac{1-e^{-i\theta_y}}{\Delta y}.
+\end{align*}
+注意
+\[
+\Re(a_x)=\frac{1-\cos\theta_x}{\Delta x}\ge0,\quad
+\Re(a_y)=\frac{1-\cos\theta_y}{\Delta y}\ge0.
+\]
+
+设在第 $n$ 步的 Fourier 系数为 $g^n$。
+第一步在该模上的标量形式为
+\[
+\frac{g^{n+\frac12}-g^n}{\Delta t/2}
++ a_x g^{n+\frac12}+a_y g^n =0,
+\]
+整理得
+\[
+\bigg(1+\frac{\Delta t}{2}a_x\bigg)g^{n+\frac12}
+=
+\bigg(1-\frac{\Delta t}{2}a_y\bigg)g^n.
+\]
+第二步为
+\[
+\frac{g^{n+1}-g^{n+\frac12}}{\Delta t/2}
++ a_x g^{n+\frac12}+a_y g^{n+1}=0,
+\]
+即
+\[
+\bigg(1+\frac{\Delta t}{2}a_y\bigg)g^{n+1}
+=
+\bigg(1-\frac{\Delta t}{2}a_x\bigg)g^{n+\frac12}.
+\]
+两式相乘得到一步增益因子
+\begin{equation*}
+G
+:=\frac{g^{n+1}}{g^n}
+=
+\frac{\big(1-\frac{\Delta t}{2}a_x\big)
+      \big(1-\frac{\Delta t}{2}a_y\big)}
+     {\big(1+\frac{\Delta t}{2}a_x\big)
+      \big(1+\frac{\Delta t}{2}a_y\big)}.
+\end{equation*}
+
+考虑复数 $\alpha$ 满足 $\Re(\alpha)\ge0$，
+则
+\[
+\left|\frac{1-\alpha}{1+\alpha}\right|\le1.
+\]
+这里 $a_x,a_y$ 的实部均非负，故
+\[
+\left|\frac{1-\frac{\Delta t}{2}a_x}{1+\frac{\Delta t}{2}a_x}\right|\le1,
+\qquad
+\left|\frac{1-\frac{\Delta t}{2}a_y}{1+\frac{\Delta t}{2}a_y}\right|\le1,
+\]
+于是
+\[
+|G|\le1.
+\]
+这对任意 $\Delta t>0$ 成立，
+说明本 ADI 迎风格式在 von~Neumann 意义下是
+\textbf{无条件稳定} 的。
+
+\bigskip
+
+\section*{题目4 \;（补充题 2）}
+
+已知非线性抛物方程
+\[
+u_t=a(u)u_{xx},
+\]
+其数值格式为（冻结系数法）
+\begin{equation*}
+v_j^{n+1}
+= v_j^{n}
++\frac12\mu a\big(u_j^{n+\frac12}\big)
+\Big(\delta_x^2 v_j^{n+1}+\delta_x^2 v_j^n\Big),
+\end{equation*}
+其中
+\[
+\mu=\frac{\Delta t}{\Delta x^2},\qquad
+v_j^{n+\frac12}=\frac32v_j^n-\frac12v_j^{n-1},
+\]
+$\delta_x^2$ 为三点中心差分。
+利用冻结系数法分析该格式的 $L_2$ 模稳定性和最大模稳定性。
+
+\subsection*{(1) 冻结系数与线性化}
+
+在冻结系数法中，把 $a(u_j^{n+\frac12})$ 看成在某个固定值处的常数，
+记为 $\tilde a>0$，则格式化为线性：
+\begin{equation*}
+\frac{v_j^{n+1}-v_j^{n}}{\Delta t}
+=
+\frac{\tilde a}{2}
+\Big(\delta_x^2 v_j^{n+1}+\delta_x^2 v_j^n\Big).
+\end{equation*}
+这正是常系数热方程
+\[
+u_t=\tilde a u_{xx}
+\]
+的 Crank--Nicolson 格式。因而可以直接套用 CN 格式的稳定性分析。
+
+\subsection*{(2) $L_2$ 模稳定性}
+
+记向量 $v^n=(\dots,v_j^n,\dots)^\top$，
+采用标准离散内积
+\[
+(v,w)=\sum_j v_j w_j\,\Delta x,\qquad
+\|v\|_2^2=(v,v).
+\]
+离散 Laplace 算子
+\[
+(\delta_x^2 v)_j=\frac{v_{j+1}-2v_j+v_{j-1}}{\Delta x^2}
+\]
+是对称负定的，即
+\[
+(\delta_x^2 v,v)\le0.
+\]
+
+把格式写成向量形式：
+\[
+\frac{v^{n+1}-v^{n}}{\Delta t}
+=
+\frac{\tilde a}{2}\Big(L v^{n+1}+L v^n\Big),
+\]
+其中 $L$ 为离散 Laplace 矩阵。
+与 $v^{n+1}+v^n$ 取内积：
+\begin{align*}
+\left(\frac{v^{n+1}-v^{n}}{\Delta t},\,v^{n+1}+v^n\right)
+&=
+\frac{\tilde a}{2}\big(L (v^{n+1}+v^n),\,v^{n+1}+v^n\big).
+\end{align*}
+左边化简为
+\[
+\frac{1}{\Delta t}\Big(\|v^{n+1}\|_2^2-\|v^n\|_2^2\Big),
+\]
+右边利用 $L$ 的对称性得
+\[
+\frac{\tilde a}{2}\big(L w,w\big)\le0,\qquad
+w=v^{n+1}+v^n.
+\]
+于是
+\[
+\frac{1}{\Delta t}
+\Big(\|v^{n+1}\|_2^2-\|v^n\|_2^2\Big)
+\le0,
+\]
+即
+\[
+\|v^{n+1}\|_2\le\|v^n\|_2.
+\]
+因而在冻结系数意义下，该格式对任意 $\Delta t>0$ 都是
+\textbf{$L_2$ 无条件稳定} 的。
+
+\subsection*{(3) 最大模稳定性}
+
+对一维周期网格做 Fourier 分析。
+设
+\[
+v_j^n = g^n e^{ij\theta},\qquad \theta\in[-\pi,\pi].
+\]
+则
+\[
+\delta_x^2 v_j^n
+=
+\lambda(\theta)v_j^n,\qquad 
+\lambda(\theta)=\frac{e^{i\theta}-2+e^{-i\theta}}{\Delta x^2}
+=\frac{-4\sin^2(\theta/2)}{\Delta x^2}\le0.
+\]
+代入线性化格式：
+\[
+\frac{g^{n+1}-g^n}{\Delta t}
+=\frac{\tilde a}{2}\lambda(\theta)
+\big(g^{n+1}+g^n\big).
+\]
+整理得
+\[
+\bigg(1-\frac{\tilde a\Delta t}{2}\lambda(\theta)\bigg)g^{n+1}
+=
+\bigg(1+\frac{\tilde a\Delta t}{2}\lambda(\theta)\bigg)g^{n}.
+\]
+记
+\[
+\rho(\theta)
+:=\frac{g^{n+1}}{g^n}
+=
+\frac{1+\frac{\tilde a\Delta t}{2}\lambda(\theta)}
+     {1-\frac{\tilde a\Delta t}{2}\lambda(\theta)}.
+\]
+由于 $\lambda(\theta)\le0$，设
+\[
+\alpha=-\frac{\tilde a\Delta t}{2}\lambda(\theta)\ge0,
+\]
+则
+\[
+\rho(\theta)=\frac{1-\alpha}{1+\alpha},
+\qquad
+|\rho(\theta)|=\frac{|1-\alpha|}{1+\alpha}\le1.
+\]
+可见每个 Fourier 模的振幅不增。
+在周期情形下，数值解可以写成这些模的线性组合，
+因此系数的放大因子均不超过 $1$，
+从而 sup 范也不会增长：
+\[
+\|v^{n+1}\|_\infty\le\|v^n\|_\infty.
+\]
+因此在冻结系数意义下，该格式对最大模也是稳定的。
+
+\end{document}
