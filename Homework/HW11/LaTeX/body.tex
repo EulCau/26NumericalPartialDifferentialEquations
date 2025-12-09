@@ -1,0 +1,234 @@
+\documentclass[12pt]{article}
+\usepackage{ctex}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+\newenvironment{solution}{\par\noindent\textbf{Solution.} }{\hfill$\square$\par}
+
+\title{NPDE 作业 11}
+\author{刘行\quad PB22000150}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{solution}
+考虑热传导模型
+\begin{equation*}
+\begin{cases}
+u_t = a u_{xx}, & x\in(0,1),\ t>0,\\[0.3em]
+u(x,0)=u_0(x), & x\in[0,1],\\[0.3em]
+-a u_x(0,t)+\sigma u(0,t)=\phi_0(t), & t>0,\\[0.3em]
+u(1,t)=\phi_1(t), & t>0,
+\end{cases}
+\end{equation*}
+其中 $a>0,\ \sigma>0$ 为常数. 
+
+在时间方向采用 Crank-Nicolson (CN) 格式, 即在内部网格点处时间二层平均, 空间用二阶中心差分逼近 $u_{xx}$. 下面逐一给出三种自然边界离散方法对应的差分格式. 
+
+\subsection*{统一网格记号}
+
+在区间 $[0,1]$ 上取等距网格
+\begin{equation*}
+x_j = jh,\quad j=0,1,\dots,M,\qquad h=\frac1M,
+\end{equation*}
+时间上取
+\begin{equation*}
+t^n=n\tau,\quad n=0,1,\dots,N.
+\end{equation*}
+记数值解
+\begin{equation*}
+u_j^n \approx u(x_j,t^n).
+\end{equation*}
+
+对内部点 $j=1,\dots,M-1$, CN 格式为
+\begin{equation}\label{eq:CN-interior}
+\frac{u_j^{n+1}-u_j^{n}}{\tau} = \frac{a}{2h^2} \Big[(u_{j+1}^{n+1}-2u_j^{n+1}+u_{j-1}^{n+1}) + (u_{j+1}^{n}-2u_j^{n}+u_{j-1}^{n}) \Big].
+\end{equation}
+
+右端本质边界条件直接写成
+\begin{equation}\label{eq:Dirichlet-right}
+u_M^{n+1}=\phi_1(t^{n+1}),\qquad n\ge0.
+\end{equation}
+
+关键在于左端自然边界 $-a u_x(0,t)+\sigma u(0,t)=\phi_0(t)$ 的离散. 下面对三种方法分别处理. 
+
+\subsection*{(1) 单侧离散方法}
+
+在 $x=0$ 处对一阶导数用一阶向前差分逼近
+\begin{equation*}
+u_x(0,t^{n+1}) \approx \frac{u_1^{n+1}-u_0^{n+1}}{h}, \qquad u(0,t^{n+1})\approx u_0^{n+1}.
+\end{equation*}
+代入边界条件得到
+\begin{equation*}
+-a\frac{u_1^{n+1}-u_0^{n+1}}{h}+\sigma u_0^{n+1} =\phi_0(t^{n+1}).
+\end{equation*}
+整理可写成
+\begin{equation}\label{eq:BC-one-sided}
+\left(\frac{a}{h}+\sigma\right)u_0^{n+1} -\frac{a}{h}u_1^{n+1} = \phi_0(t^{n+1}).
+\end{equation}
+
+综上, \emph{采用单侧离散时}, 完整的 CN 差分格式由 \eqref{eq:CN-interior} ($j=1,\dots,M-1$),  \eqref{eq:BC-one-sided} 以及 \eqref{eq:Dirichlet-right} 共同组成. 
+
+\subsection*{(2) 虚拟网格 (虚拟点) 方法}
+
+虚拟点方法的思想是: 在边界外增加一个虚拟网格点, 使得可以在 $x=0$ 处仍然使用二阶中心差分, 从而在空间上保持二阶相容性. 
+
+\paragraph{空间网格扩展}
+在原有网格基础上向左再加一个点
+\begin{equation*}
+x_{-1}=-h,
+\end{equation*}
+并令
+\begin{equation*}
+u_{-1}^n \approx u(x_{-1},t^n)
+\end{equation*}
+为虚拟未知量. 
+
+在 $x=0$ 处用中心差分逼近一阶导数:
+\begin{equation*}
+u_x(0,t^n) \approx \frac{u_1^n-u_{-1}^n}{2h},\qquad n\ge0.
+\end{equation*}
+于是边界条件在时间层 $t^n$ 上离散为
+\begin{equation}\label{eq:BC-ghost-time-n}
+-a\,\frac{u_1^n-u_{-1}^n}{2h}+\sigma u_0^n=\phi_0(t^n).
+\end{equation}
+同理, 在 $t^{n+1}$ 层有
+\begin{equation}\label{eq:BC-ghost-time-n1}
+-a\,\frac{u_1^{n+1}-u_{-1}^{n+1}}{2h}+\sigma u_0^{n+1}=\phi_0(t^{n+1}).
+\end{equation}
+
+由 \eqref{eq:BC-ghost-time-n} 解出虚拟点 $u_{-1}^n$:
+\begin{equation*}
+-a\frac{u_1^n-u_{-1}^n}{2h}+\sigma u_0^n=\phi_0(t^n) \quad\Longrightarrow\quad u_{-1}^n = u_1^n+\frac{2h}{a}\bigl(\phi_0(t^n)-\sigma u_0^n\bigr),
+\end{equation*}
+同理
+\begin{equation*}
+u_{-1}^{n+1} = u_1^{n+1}+\frac{2h}{a}\bigl(\phi_0(t^{n+1})-\sigma u_0^{n+1}\bigr).
+\end{equation*}
+
+\paragraph{0 号点的 CN 格式}
+
+采用虚拟点后, 可以把 $x_0=0$ 也当作“内部点”, 在 $j=0$ 处同样写 CN 格式:
+\begin{equation}\label{eq:CN-j0-raw}
+\frac{u_0^{n+1}-u_0^n}{\tau} = \frac{a}{2h^2} \Big[(u_1^{n+1}-2u_0^{n+1}+u_{-1}^{n+1}) + (u_1^{n}-2u_0^{n}+u_{-1}^{n}) \Big].
+\end{equation}
+将上面得到的 $u_{-1}^n,\ u_{-1}^{n+1}$ 代入 \eqref{eq:CN-j0-raw}, 得到只含真实格点未知量的边界差分方程: 
+\begin{align}
+\frac{u_0^{n+1}-u_0^n}{\tau}
+&= \frac{a}{2h^2} \Big[u_1^{n+1}-2u_0^{n+1} + u_1^{n+1}+\frac{2h}{a}\bigl(\phi_0(t^{n+1})-\sigma u_0^{n+1}\bigr) \notag\\
+&\qquad +u_1^{n}-2u_0^{n}+u_1^{n}+\frac{2h}{a}\bigl(\phi_0(t^{n})-\sigma u_0^{n}\bigr)\Big]\notag\\[0.3em]
+&= \frac{a}{h^2}\Big[(u_1^{n+1}-u_0^{n+1})+(u_1^{n}-u_0^{n})\Big]+\frac{1}{h}\Big[\phi_0(t^{n+1})+\phi_0(t^{n})-\sigma(u_0^{n+1}+u_0^{n})\Big]. \label{eq:BC-ghost-final}
+\end{align}
+
+因此, \emph{虚拟网格方法下的 CN 差分格式}由
+
+\begin{itemize}
+  \item 内部点 $j=1,\dots,M-1$ 处的 CN 方程 \eqref{eq:CN-interior};
+  \item $j=0$ 处的边界 CN 方程 \eqref{eq:BC-ghost-final};
+  \item 右端本质边界 \eqref{eq:Dirichlet-right}
+\end{itemize}
+
+共同组成. 
+
+\subsection*{(3) 半网格方法}
+
+半网格方法的思想是: 把未知量放在“单元中心”$x_{j-\frac12}$ 上, 使控制体积天然“半个网格”贴在边界, 从而在保持守恒性的同时, 在空间上仍能得到二阶相容的自然边界离散. 
+
+\paragraph{空间与时间离散}
+
+在 $[0,1]$ 上考虑半网格点
+\begin{equation*}
+x_{j-\frac12}=\Big(j-\frac12\Big)\Delta x,\quad j=0,1,\dots,J+1,
+\end{equation*}
+其中步长取为
+\begin{equation*}
+\Delta x=\frac{2}{2J+1},
+\end{equation*}
+从 $x_{-1/2}$ 到 $x_{J+1/2}$ 正好覆盖 $[-\Delta x/2,1+\Delta x/2]$, 而 $x_{J-1/2}$ 位于 $1$ 附近, 用来处理右端 Dirichlet 边界. 记
+\begin{equation*}
+u_{j-\frac12}^n \approx u(x_{j-\frac12},t^n).
+\end{equation*}
+
+内部点 (例如 $j=2,\dots,J-1$) 处的二阶导数仍用中心差分
+\begin{equation*}
+u_{xx}(x_{j-\frac12},t^n)\approx\frac{u_{j+\frac12}^n-2u_{j-\frac12}^n+u_{j-\frac32}^n}{(\Delta x)^2},
+\end{equation*}
+于是内部半网格点的 CN 格式为
+\begin{equation}\label{eq:CN-half-interior}
+\frac{u_{j-\frac12}^{n+1}-u_{j-\frac12}^{n}}{\tau} = \frac{a}{2(\Delta x)^2} \Big[u_{j+\frac12}^{n+1}-2u_{j-\frac12}^{n+1}+u_{j-\frac32}^{n+1}+u_{j+\frac12}^{n}-2u_{j-\frac12}^{n}+u_{j-\frac32}^{n}\Big].
+\end{equation}
+
+右端本质边界在半网格上可直接取
+\begin{equation}\label{eq:half-Dirichlet-right}
+u_{J-\frac12}^{n+1}=\phi_1(t^{n+1}),\qquad n\ge0.
+\end{equation}
+
+\paragraph{左端自然边界的半网格离散}
+
+左端 $x=0$ 处没有真实格点, 对导数采用“半步中心差分”, 即在 $x_{1/2}$ 与 $x_{-1/2}$ 之间做中心差分:
+\begin{equation*}
+u_x(0,t^{n})\approx\frac{u_{1/2}^n-u_{-1/2}^n}{\Delta x}, \quad u(0,t^{n})\approx\frac{u_{1/2}^n+u_{-1/2}^n}{2}.
+\end{equation*}
+代入边界条件
+\begin{equation*}
+-a u_x(0,t)+\sigma u(0,t)=\phi_0(t),
+\end{equation*}
+在时间层 $t^n$ 上得到二阶空间相容的差分式
+\begin{equation}\label{eq:half-BC-time-n}
+-\frac{a}{\Delta x}\bigl(u_{1/2}^n-u_{-1/2}^n\bigr)+\frac{\sigma}{2}\bigl(u_{1/2}^n+u_{-1/2}^n\bigr)=\phi_0(t^n).
+\end{equation}
+同理, 在 $t^{n+1}$ 层有
+\begin{equation}\label{eq:half-BC-time-n1}
+-\frac{a}{\Delta x}\bigl(u_{1/2}^{n+1}-u_{-1/2}^{n+1}\bigr)+\frac{\sigma}{2}\bigl(u_{1/2}^{n+1}+u_{-1/2}^{n+1}\bigr)=\phi_0(t^{n+1}).
+\end{equation}
+这里 $x_{-1/2}$ 是一个虚拟点, 用来保证导数离散的对称性. 
+
+\paragraph{消去虚拟半网格点}
+
+由 \eqref{eq:half-BC-time-n} 可解出 $u_{-1/2}^n$:
+\begin{equation*}
+-\frac{a}{\Delta x}(u_{1/2}^n-u_{-1/2}^n)+\frac{\sigma}{2}(u_{1/2}^n+u_{-1/2}^n)=\phi_0(t^n)
+\end{equation*}
+等价于
+\begin{equation*}
+\Big(\frac{a}{\Delta x}+\frac{\sigma}{2}\Big)u_{-1/2}^n=\Big(\frac{a}{\Delta x}-\frac{\sigma}{2}\Big)u_{1/2}^n+\phi_0(t^n),
+\end{equation*}
+从而
+\begin{equation}\label{eq:half-ghost-n}
+u_{-1/2}^n = \frac{\displaystyle \Big(\frac{a}{\Delta x}-\frac{\sigma}{2}\Big)u_{1/2}^n+\phi_0(t^n)}{\displaystyle \frac{a}{\Delta x}+\frac{\sigma}{2}}.
+\end{equation}
+同理从 \eqref{eq:half-BC-time-n1} 得到
+\begin{equation}\label{eq:half-ghost-n1}
+u_{-1/2}^{n+1} = \frac{\displaystyle \Big(\frac{a}{\Delta x}-\frac{\sigma}{2}\Big)u_{1/2}^{n+1}+\phi_0(t^{n+1})}{\displaystyle \frac{a}{\Delta x}+\frac{\sigma}{2}}.
+\end{equation}
+
+另一方面, 在最靠近左端的半网格点 $x_{1/2}$ 处 (对应 $j=1$) 的 CN 方程由 \eqref{eq:CN-half-interior} 给出:
+\begin{equation}\label{eq:CN-half-j1-raw}
+\frac{u_{1/2}^{n+1}-u_{1/2}^{n}}{\tau} = \frac{a}{2(\Delta x)^2} \Big[u_{3/2}^{n+1}-2u_{1/2}^{n+1}+u_{-1/2}^{n+1}+u_{3/2}^{n}-2u_{1/2}^{n}+u_{-1/2}^{n}\Big].
+\end{equation}
+将 \eqref{eq:half-ghost-n} 和 \eqref{eq:half-ghost-n1} 分别代入上式中的 $u_{-1/2}^n$ 与 $u_{-1/2}^{n+1}$, 即可得到只含 $u_{1/2}^{n},u_{1/2}^{n+1},u_{3/2}^{n},u_{3/2}^{n+1}$ 以及 $\phi_0(t^n),\phi_0(t^{n+1})$ 的边界差分方程. 为了书写方便, 可将代入后的各个系数记为
+\begin{equation*}
+\alpha_0,\ \alpha_1,\ \beta_0,\ \beta_1
+\end{equation*}
+等常数 (依赖 $a,\sigma,\Delta x,\tau$), 则 \eqref{eq:CN-half-j1-raw} 可以整理成
+\begin{equation}\label{eq:CN-half-j1-final}
+\alpha_0 u_{1/2}^{n+1} + \alpha_1 u_{3/2}^{n+1} = \beta_0 u_{1/2}^{n} + \beta_1 u_{3/2}^{n} + (\text{含 }\phi_0(t^n),\phi_0(t^{n+1})\text{ 的已知项}).
+\end{equation}
+
+于是, \emph{半网格方法下的 CN 差分格式}由
+
+\begin{itemize}
+  \item 内部半网格点处的 CN 方程 \eqref{eq:CN-half-interior};
+  \item 左端 $x=0$ 处由 \eqref{eq:CN-half-j1-final} 表示的边界差分方程 (其系数通过 \eqref{eq:half-ghost-n},\eqref{eq:half-ghost-n1} 代入 \eqref{eq:CN-half-j1-raw} 得到);
+  \item 右端本质边界条件 \eqref{eq:half-Dirichlet-right}
+\end{itemize}
+
+共同构成. 
+
+\medskip
+
+以上分别给出了在 CN 时间离散下, 自然边界采用单侧差分, 虚拟网格以及半网格三种空间离散方式时, 对应的差分格式. 
+\end{solution}
+
+\end{document}
